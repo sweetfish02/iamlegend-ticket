@@ -1,0 +1,45 @@
+:root{
+  --blue:#bfe8ff;
+  --yellow:#fff3a6;
+  --muted:#f4f4f6;
+  --border:#d4d4d4;
+  --accent:#2b7cff;
+  --cardbg:#fff;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Helvetica Neue",Arial;
+}
+*{box-sizing:border-box}
+body{ background:#f7f8fa; color:#111; margin:0; padding:18px; }
+.header{ margin-bottom:12px; }
+h1{ margin:0; font-size:20px; }
+.subtitle{ margin:6px 0 0 0; color:#555; font-size:13px; }
+.container{ max-width:980px; margin:0 auto; display:grid; gap:12px; grid-template-columns: 1fr; }
+.card{ background:var(--cardbg); border:1px solid var(--border); padding:12px; border-radius:8px; }
+.controls{ display:flex; gap:12px; align-items:center; }
+.control-col{ min-width:160px; }
+.label{ font-weight:600; margin-bottom:6px; }
+.btnset{ display:flex; gap:8px; flex-wrap:wrap; }
+.btnset button{ padding:8px 12px; border-radius:6px; border:1px solid var(--border); background:white; cursor:pointer; }
+.btnset button.active{ background:var(--accent); color:white; border-color:var(--accent); }
+.current{ padding:8px 10px; border-radius:6px; border:1px solid var(--border); background:#fcfcff; }
+.tablecard h2{ margin:0 0 8px 0; }
+.table-wrap{ overflow:auto; }
+table{ border-collapse:collapse; width:100%; min-width:640px; }
+th, td{ border:1px solid var(--border); padding:8px; text-align:center; font-size:13px; background:white; }
+th{ background:var(--muted); font-weight:700; }
+td.yellow{ background:var(--yellow); }
+.smallnote{ font-size:12px; color:#444; margin-top:8px; }
+.results-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.result{ border:1px solid var(--border); padding:10px; border-radius:6px; background:#fff; min-height:86px; }
+.rlabel{ color:#666; font-weight:600; }
+.rvalue{ font-size:20px; font-weight:700; margin-top:8px; }
+.rvaluelist b{ font-size:16px; }
+.muted{ color:#666; }
+.small{ font-size:12px; }
+.jsoneditor{ width:100%; height:120px; font-family:monospace; font-size:12px; padding:8px; border:1px solid var(--border); border-radius:6px; margin-top:8px; }
+.preset-actions{ display:flex; gap:8px; align-items:center; margin-top:8px; }
+.primary{ background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+.footercard{ font-size:13px; color:#444; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+@media(max-width:800px){
+  .results-grid{ grid-template-columns:1fr; }
+  table{ min-width:0; }
+}
