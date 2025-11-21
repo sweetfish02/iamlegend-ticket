@@ -1,1 +1,47 @@
-<html><body>Final ticket app</body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>티켓 계산기 (완성본)</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div class="container">
+        <h1>티켓 계산기</h1>
+
+        <!-- 티켓 단가 선택 -->
+        <div class="selector-block">
+            <div class="label">티켓 단가</div>
+            <div class="button-row" id="ticketButtons">
+                <button class="select-btn" data-ticket="2">2</button>
+                <button class="select-btn" data-ticket="3">3</button>
+            </div>
+        </div>
+
+        <!-- 상자 개수 선택 -->
+        <div class="selector-block">
+            <div class="label">상자 개수</div>
+            <div class="button-row" id="boxButtons">
+                <button class="select-btn" data-box="80">80</button>
+                <button class="select-btn" data-box="120">120</button>
+                <button class="select-btn" data-box="160">160</button>
+                <button class="select-btn" data-box="240">240</button>
+            </div>
+        </div>
+
+        <!-- 중간표 -->
+        <div id="table-area"></div>
+
+        <!-- 전부 획득 시 필요한 티켓 -->
+        <div id="required-box"></div>
+
+        <!-- 결과 표 -->
+        <div id="result-area"></div>
+
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
