@@ -4,10 +4,11 @@
 let selectedTicket = null;
 let selectedBox = null;
 let currentData = [];
-let remainingValues = {}; // 남은 개수 저장
+let remainingValues = {};
+let openedDropdown = null;
 
 /* ============================
-   🔵 버튼 초기화 (active)
+   🔵 버튼 active
 ============================ */
 function initButtons() {
     document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
@@ -43,7 +44,13 @@ function loadTable() {
             <thead>
                 <tr>
                     <th>보상 종류</th>
-                    <th>남은 개수 <span class="tooltip-icon">?</span></th>
+                    <th>
+                        남은 개수
+                        <span class="tooltip-icon" onclick="toggleTooltip()">?</span>
+                        <div id="tooltip-box" class="tooltip-box">
+                            현재 이벤트 창의 수량을 직접 입력하세요.
+                        </div>
+                    </th>
                     <th>전체 개수</th>
                     <th>단가</th>
                     <th>점수</th>
@@ -58,6 +65,7 @@ function loadTable() {
     currentData.forEach((row, index) => {
         const isFinal = row.name === "최종보상";
         const maxValue = row.count;
+
         remainingValues[index] = isFinal ? 1 : 0;
 
         html += `
@@ -90,9 +98,7 @@ function loadTable() {
             <td><b>합계</b></td>
             <td id="sumRemaining">0</td>
             <td id="sumTotal">0</td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
         </tr>
     `;
 
@@ -105,7 +111,7 @@ function loadTable() {
 }
 
 /* ============================
-   🔵 드롭다운 목록 생성
+   🔵 드롭다운 리스트 생성
 ============================ */
 function generateDropdownItems(max, index) {
     let list = "";
@@ -119,16 +125,21 @@ function generateDropdownItems(max, index) {
    🔵 드롭다운 동작
 ============================ */
 function toggleDropdown(index) {
-    document.getElementById(`dropdown_${index}`).style.display =
-        document.getElementById(`dropdown_${index}`).style.display === "none"
-            ? "block"
-            : "none";
+
+    // 다른 드롭다운 닫기
+    document.querySelectorAll(".dropdown-list").forEach(el => {
+        if (el.id !== `dropdown_${index}`) {
+            el.style.display = "none";
+        }
+    });
+
+    let target = document.getElementById(`dropdown_${index}`);
+    target.style.display = target.style.display === "none" ? "block" : "none";
 }
 
 function selectDropdown(index, value) {
     const input = document.getElementById(`input_${index}`);
     const max = parseInt(input.max);
-
     value = Math.min(value, max);
 
     input.value = value;
@@ -140,7 +151,7 @@ function selectDropdown(index, value) {
 }
 
 /* ============================
-   🔵 입력 이벤트
+   🔵 숫자 입력 이벤트
 ============================ */
 function attachInputEvents() {
     currentData.forEach((row, index) => {
@@ -165,7 +176,7 @@ function attachInputEvents() {
 }
 
 /* ============================
-   🔵 전체 계산
+   🔵 전체 계산 업데이트
 ============================ */
 function updateAll() {
     let sumRemaining = 0;
@@ -180,11 +191,9 @@ function updateAll() {
             sumTotal += total;
         }
 
-        // 점수 (정수)
         const score = remain * row.price;
         document.getElementById(`score_${index}`).innerText = score;
 
-        // 티켓화 (소수점 1자리)
         const ticket = (score / 30).toFixed(1);
         document.getElementById(`ticket_${index}`).innerText = ticket;
     });
@@ -208,44 +217,78 @@ function updateRequired(sumRemaining) {
 }
 
 /* ============================
-   🔵 결과 표
+   🔵 결과표 (4×4 구조)
 ============================ */
 function updateResults(sumRemaining) {
-    // 전부반환 / 최종제외 / 최종&A 제외
     let totalRefund = 0;
     let exceptFinal = 0;
     let exceptFinalA = 0;
 
     currentData.forEach((row, index) => {
-        const name = row.name;
         const ticket = parseFloat(document.getElementById(`ticket_${index}`).innerText);
+        const name = row.name;
 
         totalRefund += ticket;
-
         if (name !== "최종보상") exceptFinal += ticket;
         if (name !== "최종보상" && name !== "A") exceptFinalA += ticket;
     });
 
     const required = sumRemaining * selectedTicket;
 
-    // 손익 계산 (양수 초록 / 음수 빨강)
-    const getColored = (value) => {
-        const color = value >= 0 ? "green" : "red";
-        return `<span class="${color}">${value}</span>`;
-    };
+    const c1 = (totalRefund - required).toFixed(1);
+    const c2 = (exceptFinal - required).toFixed(1);
+    const c3 = (exceptFinalA - required).toFixed(1);
+
+    const jewel1 = (c1 * 300).toFixed(0);
+    const jewel2 = (c2 * 300).toFixed(0);
+    const jewel3 = (c3 * 300).toFixed(0);
+
+    // 색상 처리 함수
+    const color = (v) => v >= 0 ? "green" : "red";
 
     let html = `
         <table>
-            <tr><th colspan="2">결과</th></tr>
-            <tr><td>전부 반환</td><td>${totalRefund.toFixed(1)}</td></tr>
-            <tr><td>최종 제외</td><td>${exceptFinal.toFixed(1)}</td></tr>
-            <tr><td>최종 & A 제외</td><td>${exceptFinalA.toFixed(1)}</td></tr>
-            <tr><td>티켓 손익</td><td>${getColored((totalRefund - required).toFixed(1))}</td></tr>
-            <tr><td>보석 가치</td><td>${getColored(((totalRefund - required) * 300).toFixed(0))}</td></tr>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>전부 반환</th>
+                    <th>최종 제외</th>
+                    <th>최종 & A 제외</th>
+                </tr>
+            </thead>
+
+            <tr>
+                <td>반환 시 돌려받는 티켓</td>
+                <td>${totalRefund.toFixed(1)}</td>
+                <td>${exceptFinal.toFixed(1)}</td>
+                <td>${exceptFinalA.toFixed(1)}</td>
+            </tr>
+
+            <tr>
+                <td>티켓 손익</td>
+                <td style="color:${color(c1)}">${c1}</td>
+                <td style="color:${color(c2)}">${c2}</td>
+                <td style="color:${color(c3)}">${c3}</td>
+            </tr>
+
+            <tr>
+                <td>보석 가치</td>
+                <td style="color:${color(jewel1)}">${jewel1}</td>
+                <td style="color:${color(jewel2)}">${jewel2}</td>
+                <td style="color:${color(jewel3)}">${jewel3}</td>
+            </tr>
         </table>
     `;
 
     document.getElementById("result-area").innerHTML = html;
+}
+
+/* ============================
+   🔵 툴팁 (클릭 토글)
+============================ */
+function toggleTooltip() {
+    const box = document.getElementById("tooltip-box");
+    box.style.display = (box.style.display === "block") ? "none" : "block";
 }
 
 /* ============================
