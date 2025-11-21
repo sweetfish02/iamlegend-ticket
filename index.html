@@ -1,118 +1,21 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>티켓 & 상자 계산기</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<title>티켓 계산기</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="header">
-    <h1>티켓 & 상자 계산기</h1>
-    <p class="subtitle">파란 버튼으로 티켓단가·상자개수를 선택하고 노란칸(남은 개수)을 입력하면 실시간 계산됩니다.</p>
-  </header>
-
-  <main class="container">
-    <section class="controls card">
-      <div class="control-col">
-        <div class="label">티켓 단가</div>
-        <div id="ticketPriceButtons" class="btnset"></div>
-      </div>
-      <div class="control-col">
-        <div class="label">상자 개수</div>
-        <div id="boxCountButtons" class="btnset"></div>
-      </div>
-      <div class="control-col">
-        <div class="label">현재 선택</div>
-        <div id="currentSelection" class="current"></div>
-      </div>
-    </section>
-
-    <section class="card tablecard">
-      <h2>중간표 — 보상 목록</h2>
-      <div class="table-wrap">
-        <table id="middleTable">
-          <thead>
-            <tr>
-              <th>보상 종류<br><span class="muted small">(최종보상 포함)</span></th>
-              <th>남은 개수<br><span class="muted small">(직접입력)</span></th>
-              <th>전체 개수</th>
-              <th>단가</th>
-              <th>점수</th>
-              <th>티켓화</th>
-            </tr>
-          </thead>
-          <tbody id="middleBody"></tbody>
-          <tfoot>
-            <tr>
-              <th>합계 (최종 제외)</th>
-              <th id="sumRemaining">0</th>
-              <th id="sumTotal">0</th>
-              <th></th>
-              <th id="sumScore">0</th>
-              <th id="sumTicketized">0</th>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-      <p class="smallnote">노란 셀(남은 개수)은 전체 개수의 범위를 초과할 수 없습니다. 최종보상(맨 위 행)은 항상 전체개수 = 1입니다.</p>
-    </section>
-
-    <section class="card resultscard">
-      <h2>결과</h2>
-      <div class="results-grid">
-        <div class="result">
-          <div class="rlabel">전부 획득 시 필요한 티켓</div>
-          <div class="rvalue" id="neededTickets">0</div>
-          <div class="muted small">계산식: 티켓단가 × (노란셀 합계, 최종 제외)</div>
-        </div>
-        <div class="result">
-          <div class="rlabel">돌려받는 티켓</div>
-          <div class="rvaluelist">
-            <div>전부 반환: <b id="refundAll">0</b></div>
-            <div>최종 제외: <b id="refundExFinal">0</b></div>
-            <div>최종 &amp; A 제외: <b id="refundExFinalA">0</b></div>
-          </div>
-          <div class="muted small">계산식: 각 행의 티켓화 합계 (조건에 따라 제외)</div>
-        </div>
-        <div class="result">
-          <div class="rlabel">티켓 손익</div>
-          <div class="rvaluelist">
-            <div>전부 반환 기준: <b id="profitAll">0</b></div>
-            <div>최종 제외 기준: <b id="profitExFinal">0</b></div>
-            <div>최종&amp;A 제외 기준: <b id="profitExFinalA">0</b></div>
-          </div>
-          <div class="muted small">계산식: 필요 티켓 - 돌려받는 티켓</div>
-        </div>
-        <div class="result">
-          <div class="rlabel">보석 가치 (추정)</div>
-          <div class="rvaluelist">
-            <div>전부 반환 기준: <b id="gemAll">0</b></div>
-            <div>최종 제외 기준: <b id="gemExFinal">0</b></div>
-            <div>최종&amp;A 제외 기준: <b id="gemExFinalA">0</b></div>
-          </div>
-          <div class="muted small">계산식: 티켓 손익 × 300</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card presetcard">
-      <h2>프리셋 편집 (고급)</h2>
-      <p class="muted small">현재 선택한 티켓단가/상자개수에 대한 프리셋(JSON)을 수정하여 전체개수/단가를 직접 업데이트할 수 있습니다.</p>
-      <textarea id="presetJson" class="jsoneditor"></textarea>
-      <div class="preset-actions">
-        <button id="applyPresetBtn" class="primary">Save Preset (현재 선택에 저장)</button>
-        <button id="resetPresetBtn">Reset JSON</button>
-        <div class="muted small">예: [{"name":"최종보상","total":1,"unit":540}, {"name":"A","total":2,"unit":540}, ... ]</div>
-      </div>
-    </section>
-
-    <footer class="card footercard">
-      <div>이 파일을 GitHub에 올리고 GitHub Pages를 활성화하면 여러 사용자가 접속해 각자 실시간으로 값을 입력하고 확인할 수 있습니다.</div>
-      <div class="muted small">원하면 배포 방법(GitHub Pages 단계)을 이어서 알려드릴게요.</div>
-    </footer>
-  </main>
-
-  <script src="script.js"></script>
+<h1>티켓 계산기</h1>
+<select id="select">
+<option value="3_80">티켓 3 / 80개</option>
+<option value="2_240">티켓 2 / 240개</option>
+<option value="2_80">티켓 2 / 80개</option>
+<option value="2_120">티켓 2 / 120개</option>
+<option value="3_160">티켓 3 / 160개</option>
+</select>
+<table id="table"></table>
+<script src="data.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
