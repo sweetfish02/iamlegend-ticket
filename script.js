@@ -20,7 +20,7 @@ let openDropdown = null;
  ******************************************************/
 ticketButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        selectedTicket = Number(btn.dataset.ticket);
+        selectedTicket = btn.dataset.ticket;  // 숫자로 바꾸지 말고 문자열 그대로
 
         ticketButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
@@ -38,9 +38,10 @@ ticketButtons.forEach(btn => {
  ******************************************************/
 function updateBoxButtons() {
     boxButtons.forEach(btn => {
-        const boxCount = Number(btn.dataset.box);
+        const boxCount = btn.dataset.box;   // 문자열
+        const ticketKey = String(selectedTicket); 
 
-        if (selectedTicket && boxData[selectedTicket][boxCount]) {
+        if (selectedTicket && boxData[ticketKey] && boxData[ticketKey][boxCount]) {
             btn.classList.remove("disabled-btn");
             btn.disabled = false;
         } else {
