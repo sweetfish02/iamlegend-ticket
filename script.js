@@ -1,47 +1,43 @@
-/******************************************************
- *  데이터 로드
- ******************************************************/
-const boxData = DATA; // data.js에 있는 데이터
+/* --------------------------
+   🔵 데이터 불러오기
+--------------------------- */
 
-let selectedTicket = null;
+let selectedTicket = null;  // 문자열로 저장
 let selectedBox = null;
-
-const ticketButtons = document.querySelectorAll("#ticketButtons .select-btn");
-const boxButtons = document.querySelectorAll("#boxButtons .select-btn");
 
 const tableArea = document.getElementById("table-area");
 const resultArea = document.getElementById("result-area");
 const requiredBox = document.getElementById("required-box");
 
-let openDropdown = null;
+const ticketButtons = document.querySelectorAll("#ticketButtons .select-btn");
+const boxButtons = document.querySelectorAll("#boxButtons .select-btn");
 
-/******************************************************
- *  티켓 단가 선택
- ******************************************************/
+/* --------------------------
+   🔵 티켓 단가 버튼 클릭
+--------------------------- */
 ticketButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        selectedTicket = btn.dataset.ticket;  // 숫자로 바꾸지 말고 문자열 그대로
-
         ticketButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        // 상자 버튼 활성/비활성 업데이트
-        updateBoxButtons();
+        selectedTicket = btn.dataset.ticket; // **문자열 그대로 저장**
 
-        // 표 초기화
-        clearTables();
+        selectedBox = null;
+        clearLowerSections();
+        updateBoxButtons();
     });
 });
 
-/******************************************************
- *  상자 개수 버튼 활성화 로직
- ******************************************************/
+/* --------------------------
+   🔵 상자 개수 버튼 활성/비활성
+--------------------------- */
 function updateBoxButtons() {
-    boxButtons.forEach(btn => {
-        const boxCount = btn.dataset.box;   // 문자열
-        const ticketKey = String(selectedTicket); 
+    const ticketKey = String(selectedTicket);
 
-        if (selectedTicket && boxData[ticketKey] && boxData[ticketKey][boxCount]) {
+    boxButtons.forEach(btn => {
+        const boxCount = btn.dataset.box;
+
+        if (selectedTicket && DATA[ticketKey] && DATA[ticketKey][boxCount]) {
             btn.classList.remove("disabled-btn");
             btn.disabled = false;
         } else {
@@ -53,210 +49,224 @@ function updateBoxButtons() {
     });
 }
 
-/******************************************************
- *  상자 클릭 처리
- ******************************************************/
+/* --------------------------
+   🔵 상자 개수 클릭
+--------------------------- */
 boxButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        if (btn.classList.contains("disabled-btn")) return;
-
-        selectedBox = Number(btn.dataset.box);
+        if (btn.disabled) return;
 
         boxButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        loadTable();
+        selectedBox = btn.dataset.box; // 문자열 그대로 저장
+
+        renderTable();
     });
 });
 
-/******************************************************
- *  표 그리기
- ******************************************************/
-function loadTable() {
-    if (!selectedTicket || !selectedBox) return;
+/* --------------------------
+   🔵 중간 표 + 드롭다운 + 계산
+--------------------------- */
+function renderTable() {
+    clearLowerSections();
 
-    const data = boxData[selectedTicket][selectedBox];
-    if (!data) {
-        tableArea.innerHTML = `<p style="color:red; font-weight:bold; text-align:center;">만족하는 상자 없음</p>`;
-        resultArea.innerHTML = "";
-        requiredBox.innerHTML = "";
+    if (!DATA[selectedTicket] || !DATA[selectedTicket][selectedBox]) {
+        tableArea.innerHTML = `<p style="color:red; font-weight:bold;">만족하는 상자 없음</p>`;
         return;
     }
 
-    const rows = Object.keys(data);
-
+    const info = DATA[selectedTicket][selectedBox];
     let html = `
-        <table>
-            <tr>
-                <th>보상 종류</th>
-                <th>남은 개수 <span class="tooltip-icon">?</span>
-                    <span class="tooltip-box">현재 이벤트 창의 수량을 직접 입력하세요.</span>
-                </th>
-                <th>전체 개수</th>
-                <th>단가</th>
-                <th>점수</th>
-                <th>티켓화</th>
-            </tr>
+    <table>
+        <tr>
+            <th>보상 종류</th>
+            <th>남은 개수 <span class="tooltip-icon">?</span>
+                <span class="tooltip-box">현재 이벤트 창의 수량을 직접 입력하세요.</span>
+            </th>
+            <th>전체 개수</th>
+            <th>단가</th>
+            <th>점수</th>
+            <th>티켓화</th>
+        </tr>
     `;
 
-    rows.forEach(r => {
-        const maxVal = data[r].total;
+    info.rows.forEach((row, idx) => {
+        const type = row.type;
+        const total = row.total;
+        const price = row.price;
 
         html += `
             <tr>
-                <td>${r}</td>
+                <td>${type}</td>
                 <td class="input-cell">
-                    <div class="dropdown-wrapper" data-row="${r}">
-                        <input type="number" value="${data[r].left}" min="0" max="${maxVal}" readonly />
-                        <div class="dropdown-btn">▼</div>
-                        <div class="dropdown-list" style="display:none;">
-                            ${Array.from({ length: maxVal + 1 }, (_, i) => `<div class="dropdown-item">${i}</div>`).join("")}
-                        </div>
-                    </div>
+                    ${createDropdown(idx, total)}
                 </td>
-                <td>${data[r].total}</td>
-                <td>${data[r].value}</td>
-                <td class="score-cell">0</td>
-                <td class="ticket-cell">0</td>
+                <td>${total}</td>
+                <td>${price}</td>
+                <td id="score_${idx}">0</td>
+                <td id="ticket_${idx}">0</td>
             </tr>
         `;
     });
 
-    html += `</table>`;
+    // ⭐ 합계 행
+    html += `
+        <tr>
+            <th>합계</th>
+            <td id="sumRemain"></td>
+            <td id="sumTotal">${info.totalWithoutFinal}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>`;
 
     tableArea.innerHTML = html;
 
-    attachDropdownEvents();
-    calculate();
+    activateDropdowns(info.rows);
 }
 
-/******************************************************
- *  드롭다운 이벤트
- ******************************************************/
-function attachDropdownEvents() {
-    document.querySelectorAll(".dropdown-wrapper").forEach(wrap => {
-        const btn = wrap.querySelector(".dropdown-btn");
-        const list = wrap.querySelector(".dropdown-list");
-        const input = wrap.querySelector("input");
+/* --------------------------
+   🔵 드롭다운 UI 구성
+--------------------------- */
+function createDropdown(idx, maxVal) {
+    let listItems = "";
+    for (let i = 0; i <= maxVal; i++) {
+        listItems += `<div class="dropdown-item" data-value="${i}">${i}</div>`;
+    }
 
-        btn.addEventListener("click", () => {
-            if (openDropdown && openDropdown !== list) openDropdown.style.display = "none";
-            list.style.display = list.style.display === "block" ? "none" : "block";
-            openDropdown = list;
-        });
+    return `
+        <div class="dropdown-wrapper">
+            <input type="number" id="remain_${idx}" value="0" readonly />
+            <span class="dropdown-btn" data-idx="${idx}">▼</span>
+            <div class="dropdown-list" id="list_${idx}" style="display:none;">
+                ${listItems}
+            </div>
+        </div>
+    `;
+}
 
-        wrap.querySelectorAll(".dropdown-item").forEach(item => {
-            item.addEventListener("click", () => {
-                input.value = item.textContent;
-                list.style.display = "none";
-                calculate();
-            });
+/* --------------------------
+   🔵 드롭다운 동작
+--------------------------- */
+function activateDropdowns(rows) {
+    const dropdownBtns = document.querySelectorAll(".dropdown-btn");
+
+    dropdownBtns.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            closeAllDropdowns();
+
+            const idx = btn.dataset.idx;
+            document.getElementById(`list_${idx}`).style.display = "block";
         });
     });
 
-    document.body.addEventListener("click", e => {
-        if (!e.target.closest(".dropdown-wrapper")) {
-            if (openDropdown) openDropdown.style.display = "none";
-        }
+    const items = document.querySelectorAll(".dropdown-item");
+    items.forEach(item => {
+        item.addEventListener("click", () => {
+            const idx = item.parentElement.id.split("_")[1];
+            const value = Number(item.dataset.value);
+            const maxVal = rows[idx].total;
+
+            let v = Math.min(value, maxVal);
+
+            document.getElementById(`remain_${idx}`).value = v;
+
+            closeAllDropdowns();
+            calculate();
+        });
     });
 }
 
-/******************************************************
- *  계산 실행
- ******************************************************/
+function closeAllDropdowns() {
+    document.querySelectorAll(".dropdown-list").forEach(list => {
+        list.style.display = "none";
+    });
+}
+
+/* --------------------------
+   🔵 계산 수행
+--------------------------- */
 function calculate() {
-    const rows = document.querySelectorAll("#table-area table tr");
-    if (rows.length <= 1) return;
+    const info = DATA[selectedTicket][selectedBox];
+    const rows = info.rows;
 
-    let totalLeft = 0;
+    let sumRemain = 0;
+    let totalReturn = 0;
+    let returnNoFinal = 0;
+    let returnNoFinalA = 0;
 
-    rows.forEach((row, i) => {
-        if (i === 0) return;
+    rows.forEach((row, idx) => {
+        const n = Number(document.getElementById(`remain_${idx}`).value);
+        const price = row.price;
 
-        const tds = row.querySelectorAll("td");
-        const left = Number(tds[1].querySelector("input").value);
-        const total = Number(tds[2].textContent);
-        const value = Number(tds[3].textContent);
-
-        if (i > 1) totalLeft += left;
-
-        const score = left * value;
+        const score = n * price;
         const ticket = score / 30;
 
-        tds[4].textContent = score.toFixed(0);
-        tds[5].textContent = ticket.toFixed(1);
+        document.getElementById(`score_${idx}`).innerText = Math.round(score);
+        document.getElementById(`ticket_${idx}`).innerText = ticket.toFixed(1);
+
+        if (idx > 0) sumRemain += n; // 최종보상 제외
+        totalReturn += ticket;
+        if (idx !== 0) returnNoFinal += ticket;
+        if (idx !== 0 && idx !== 1) returnNoFinalA += ticket;
     });
 
-    const required = totalLeft * selectedTicket;
+    document.getElementById("sumRemain").innerText = sumRemain;
+
+    const need = sumRemain * Number(selectedTicket);
 
     requiredBox.innerHTML = `
-        <h3>전부 획득 시 필요한 티켓: <b>${required}</b></h3>
+        <h3>전부 획득 시 필요한 티켓: <b>${need}</b></h3>
     `;
 
-    calculateResult(required);
+    renderResult(totalReturn, returnNoFinal, returnNoFinalA, need);
 }
 
-/******************************************************
- *  결과표 계산
- ******************************************************/
-function calculateResult(required) {
-    const ticketCells = document.querySelectorAll(".ticket-cell");
-
-    let sumFull = 0, sumNoFinal = 0, sumNoFinalA = 0;
-
-    ticketCells.forEach((cell, i) => {
-        const v = Number(cell.textContent);
-
-        sumFull += v;
-        if (i !== 0) sumNoFinal += v;
-        if (i !== 0 && i !== 1) sumNoFinalA += v;
-    });
-
-    const p1 = sumFull - required;
-    const p2 = sumNoFinal - required;
-    const p3 = sumNoFinalA - required;
-
-    const g1 = p1 * 300;
-    const g2 = p2 * 300;
-    const g3 = p3 * 300;
+/* --------------------------
+   🔵 결과 표 출력
+--------------------------- */
+function renderResult(all, noFinal, noFinalA, need) {
+    function colored(v) {
+        if (v < 0) return `<span class="red">${v}</span>`;
+        return `<span class="green">${v}</span>`;
+    }
 
     resultArea.innerHTML = `
-        <table>
-            <tr>
-                <th>구분</th>
-                <th>전부 반환</th>
-                <th>최종 제외</th>
-                <th>최종 & A 제외</th>
-            </tr>
-
-            <tr>
-                <td>반환 시 돌려받는 티켓</td>
-                <td>${sumFull.toFixed(1)}</td>
-                <td>${sumNoFinal.toFixed(1)}</td>
-                <td>${sumNoFinalA.toFixed(1)}</td>
-            </tr>
-
-            <tr>
-                <td>티켓 손익</td>
-                <td class="${p1 >= 0 ? "green" : "red"}">${p1.toFixed(1)}</td>
-                <td class="${p2 >= 0 ? "green" : "red"}">${p2.toFixed(1)}</td>
-                <td class="${p3 >= 0 ? "green" : "red"}">${p3.toFixed(1)}</td>
-            </tr>
-
-            <tr>
-                <td>보석 가치</td>
-                <td class="${g1 >= 0 ? "green" : "red"}">${g1.toFixed(0)}</td>
-                <td class="${g2 >= 0 ? "green" : "red"}">${g2.toFixed(0)}</td>
-                <td class="${g3 >= 0 ? "green" : "red"}">${g3.toFixed(0)}</td>
-            </tr>
-        </table>
+    <table>
+        <tr>
+            <th>구분</th>
+            <th>전부 반환</th>
+            <th>최종 제외</th>
+            <th>최종 & A 제외</th>
+        </tr>
+        <tr>
+            <td>반환 시 돌려받는 티켓</td>
+            <td>${all.toFixed(1)}</td>
+            <td>${noFinal.toFixed(1)}</td>
+            <td>${noFinalA.toFixed(1)}</td>
+        </tr>
+        <tr>
+            <td>티켓 손익</td>
+            <td>${colored((all - need).toFixed(1))}</td>
+            <td>${colored((noFinal - need).toFixed(1))}</td>
+            <td>${colored((noFinalA - need).toFixed(1))}</td>
+        </tr>
+        <tr>
+            <td>보석 가치</td>
+            <td>${colored(((all - need) * 300).toFixed(0))}</td>
+            <td>${colored(((noFinal - need) * 300).toFixed(0))}</td>
+            <td>${colored(((noFinalA - need) * 300).toFixed(0))}</td>
+        </tr>
+    </table>
     `;
 }
 
-/******************************************************
- *  표 초기화
- ******************************************************/
-function clearTables() {
+/* --------------------------
+   🔵 하위 섹션 초기화
+--------------------------- */
+function clearLowerSections() {
     tableArea.innerHTML = "";
     resultArea.innerHTML = "";
     requiredBox.innerHTML = "";
