@@ -70,38 +70,56 @@ td {
     background: #fff8c4;
 }
 
+/* 숫자 입력칸 */
 input[type="number"] {
-    width: 60px;
+    width: 70px;
     background: #fff8c4;
     text-align: center;
     font-size: 16px;
+    padding-right: 24px; /* ▼ 공간 확보 */
 }
 
-/* 드롭다운 전용 버튼 */
+/* ▼ 드롭다운 구조 */
 .dropdown-wrapper {
     position: relative;
-}
-.dropdown-btn {
-    width: 60px;
-    background: #fff8c4;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px; /* 입력칸 + 버튼 포함 영역 */
 }
 
-/* ▼ 목록 */
+/* ▼ 버튼 (오른쪽에 표시) */
+.dropdown-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    user-select: none;
+    color: #444;
+}
+
+/* ▼ 클릭시 나오는 목록 */
 .dropdown-list {
     position: absolute;
-    top: 33px;
-    left: 0;
+    top: 38px; /* 입력칸 아래 정확하게 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
     background: white;
     border: 1px solid #aaa;
-    max-height: 150px;
+    max-height: 160px;
     overflow-y: auto;
     z-index: 999;
 }
+
 .dropdown-item {
-    padding: 5px;
+    padding: 6px;
     cursor: pointer;
+    text-align: center;
 }
+
 .dropdown-item:hover {
     background: #eee;
 }
@@ -132,6 +150,7 @@ input[type="number"] {
     width: 230px;
     z-index: 1000;
 }
+
 .tooltip-icon:hover + .tooltip-box {
     display: block;
 }
