@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>티켓 계산기</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<h1>티켓 계산기</h1>
-<select id="select">
-<option value="3_80">티켓 3 / 80개</option>
-<option value="2_240">티켓 2 / 240개</option>
-<option value="2_80">티켓 2 / 80개</option>
-<option value="2_120">티켓 2 / 120개</option>
-<option value="3_160">티켓 3 / 160개</option>
-</select>
-<table id="table"></table>
-<script src="data.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+<html lang="ko"><head><meta charset="UTF-8"><title>티켓 계산기</title>
+<link rel="stylesheet" href="style.css"></head>
+<body><div class="card"><h2>티켓 계산기</h2>
+<div>
+<label>티켓 단가:</label>
+<button class="sel" onclick="setTicket(2)">2</button>
+<button class="sel" onclick="setTicket(3)">3</button>
+</div>
+<div>
+<label>상자 개수:</label>
+<button class="sel" onclick="setBox(80)">80</button>
+<button class="sel" onclick="setBox(120)">120</button>
+<button class="sel" onclick="setBox(160)">160</button>
+<button class="sel" onclick="setBox(240)">240</button>
+</div>
+<div id="table-area"></div>
+<div id="result-area"></div>
+</div>
+<script src="data.js"></script><script src="script.js"></script>
+</body></html>
