@@ -32,7 +32,7 @@ h1 {
     gap: 10px;
 }
 
-.select-btn {
+.select-btn, .ticket-btn, .box-btn {
     padding: 8px 15px;
     border-radius: 6px;
     background: #e0e0e0;
@@ -41,12 +41,21 @@ h1 {
     font-size: 16px;
 }
 
-.select-btn.active {
-    background: #2196F3;
-    color: white;
-    font-weight: bold;
+.active {
+    background: #2196F3 !important;
+    color: white !important;
+    font-weight: bold !important;
 }
 
+/* 비활성 버튼 */
+.disabled-btn {
+    background: #cccccc !important;
+    color: #777 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* 테이블 기본 */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -76,7 +85,7 @@ input[type="number"] {
     background: #fff8c4;
     text-align: center;
     font-size: 16px;
-    padding-right: 24px; /* ▼ 공간 확보 */
+    padding-right: 24px;
 }
 
 /* ▼ 드롭다운 구조 */
@@ -85,10 +94,10 @@ input[type="number"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 90px; /* 입력칸 + 버튼 포함 영역 */
+    width: 90px;
 }
 
-/* ▼ 버튼 (오른쪽에 표시) */
+/* ▼ 버튼 */
 .dropdown-btn {
     position: absolute;
     right: 6px;
@@ -100,10 +109,10 @@ input[type="number"] {
     color: #444;
 }
 
-/* ▼ 클릭시 나오는 목록 */
+/* ▼ 목록 */
 .dropdown-list {
     position: absolute;
-    top: 38px; /* 입력칸 아래 정확하게 위치 */
+    top: 38px;
     left: 50%;
     transform: translateX(-50%);
     width: 90px;
@@ -132,7 +141,7 @@ input[type="number"] {
     color: green;
 }
 
-/* 툴팁(?) */
+/* 툴팁 */
 .tooltip-icon {
     color: #555;
     margin-left: 4px;
