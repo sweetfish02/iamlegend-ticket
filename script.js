@@ -7,40 +7,97 @@ let currentData = [];
 let remainingValues = {};
 let openedDropdown = null;
 
+/* 유효한 조합 정의 */
+const validOptions = [
+    "3-80",
+    "3-160",
+    "2-80",
+    "2-120",
+    "2-240"
+];
+
 /* ============================
-   🔵 버튼 active
+   🔵 버튼 초기화
 ============================ */
 function initButtons() {
-    document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
+    const ticketBtns = document.querySelectorAll(".ticket-btn");
+    const boxBtns = document.querySelectorAll(".box-btn");
+
+    /* ▶ 티켓 단가 버튼 */
+    ticketBtns.forEach(btn => {
         btn.addEventListener("click", () => {
-            document.querySelectorAll("#ticketButtons .select-btn").forEach(b => b.classList.remove("active"));
+            selectedTicket = btn.dataset.value;
+
+            ticketBtns.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            selectedTicket = btn.dataset.ticket;
-            loadTable();
+
+            updateBoxButtons(); // 상자버튼 상태 갱신
+            loadTable();        // 테이블 갱신
         });
     });
 
-    document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
+    /* ▶ 상자 개수 버튼 */
+    boxBtns.forEach(btn => {
         btn.addEventListener("click", () => {
-            document.querySelectorAll("#boxButtons .select-btn").forEach(b => b.classList.remove("active"));
+            if (btn.disabled) return;
+
+            selectedBox = btn.dataset.value;
+
+            boxBtns.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            selectedBox = btn.dataset.box;
+
             loadTable();
         });
     });
 }
 
 /* ============================
-   🔵 중간표 로딩
+   🔵 가능한 상자 버튼만 활성화
+============================ */
+function updateBoxButtons() {
+    const boxBtns = document.querySelectorAll(".box-btn");
+
+    boxBtns.forEach(btn => {
+        const key = `${selectedTicket}-${btn.dataset.value}`;
+        const isValid = validOptions.includes(key);
+
+        if (isValid) {
+            btn.disabled = false;
+            btn.classList.remove("disabled-btn");
+        } else {
+            btn.disabled = true;
+            btn.classList.add("disabled-btn");
+            btn.classList.remove("active"); // 비활성 시 선택 해제
+        }
+    });
+
+    selectedBox = null; // 선택 해제
+}
+
+/* ============================
+   🔵 테이블 로딩
 ============================ */
 function loadTable() {
     if (!selectedTicket || !selectedBox) return;
 
-    const key = `${selectedTicket}_${selectedBox}`;
+    const key = `${selectedTicket}-${selectedBox}`;
+
+    // 조합이 존재하지 않으면 표시 X
+    if (!validOptions.includes(key)) {
+        document.getElementById("table-area").innerHTML =
+            `<div style="color:red; font-weight:bold; margin-top:20px; font-size:20px;">
+                만족하는 상자 없음
+             </div>`;
+        document.getElementById("result-area").innerHTML = "";
+        document.getElementById("required-box").innerHTML = "";
+        return;
+    }
+
+    // 정상 조합이면 테이블 출력
     currentData = rewardData[key];
 
     let html = `
-        <table>
+        <table id="reward-table">
             <thead>
                 <tr>
                     <th>보상 종류</th>
@@ -65,12 +122,12 @@ function loadTable() {
     currentData.forEach((row, index) => {
         const isFinal = row.name === "최종보상";
         const maxValue = row.count;
-
         remainingValues[index] = isFinal ? 1 : 0;
 
         html += `
             <tr>
                 <td>${row.name}</td>
+
                 <td class="input-cell">
                     ${isFinal ? `
                         <input type="number" disabled value="1">
@@ -78,12 +135,13 @@ function loadTable() {
                         <div class="dropdown-wrapper">
                             <input type="number" id="input_${index}" value="0" min="0" max="${maxValue}">
                             <div class="dropdown-btn" onclick="toggleDropdown(${index})">▼</div>
-                            <div class="dropdown-list" id="dropdown_${index}" style="display:none;">
+                            <div class="dropdown-list" id="dropdown_${index}">
                                 ${generateDropdownItems(maxValue, index)}
                             </div>
                         </div>
                     `}
                 </td>
+
                 <td>${row.count}</td>
                 <td>${row.price}</td>
                 <td id="score_${index}">0</td>
@@ -111,7 +169,7 @@ function loadTable() {
 }
 
 /* ============================
-   🔵 드롭다운 리스트 생성
+   🔵 드롭다운 옵션 생성
 ============================ */
 function generateDropdownItems(max, index) {
     let list = "";
@@ -122,19 +180,16 @@ function generateDropdownItems(max, index) {
 }
 
 /* ============================
-   🔵 드롭다운 동작
+   🔵 드롭다운 UI
 ============================ */
 function toggleDropdown(index) {
-
-    // 다른 드롭다운 닫기
-    document.querySelectorAll(".dropdown-list").forEach(el => {
-        if (el.id !== `dropdown_${index}`) {
-            el.style.display = "none";
-        }
+    // 기존 열려 있는 드롭다운 닫기
+    document.querySelectorAll(".dropdown-list").forEach(d => {
+        if (d.id !== `dropdown_${index}`) d.style.display = "none";
     });
 
     let target = document.getElementById(`dropdown_${index}`);
-    target.style.display = target.style.display === "none" ? "block" : "none";
+    target.style.display = target.style.display === "block" ? "none" : "block";
 }
 
 function selectDropdown(index, value) {
@@ -146,12 +201,11 @@ function selectDropdown(index, value) {
     remainingValues[index] = value;
 
     document.getElementById(`dropdown_${index}`).style.display = "none";
-
     updateAll();
 }
 
 /* ============================
-   🔵 숫자 입력 이벤트
+   🔵 입력 이벤트
 ============================ */
 function attachInputEvents() {
     currentData.forEach((row, index) => {
@@ -169,14 +223,13 @@ function attachInputEvents() {
 
             input.value = val;
             remainingValues[index] = val;
-
             updateAll();
         });
     });
 }
 
 /* ============================
-   🔵 전체 계산 업데이트
+   🔵 전체 계산
 ============================ */
 function updateAll() {
     let sumRemaining = 0;
@@ -206,18 +259,17 @@ function updateAll() {
 }
 
 /* ============================
-   🔵 전부 획득 시 필요한 티켓
+   🔵 필요한 티켓
 ============================ */
 function updateRequired(sumRemaining) {
     const required = sumRemaining * selectedTicket;
 
-    document.getElementById("required-box").innerHTML = `
-        <h3>전부 획득 시 필요한 티켓 : ${required}</h3>
-    `;
+    document.getElementById("required-box").innerHTML =
+        `<h3>전부 획득 시 필요한 티켓 : ${required}</h3>`;
 }
 
 /* ============================
-   🔵 결과표 (4×4 구조)
+   🔵 최종 결과표
 ============================ */
 function updateResults(sumRemaining) {
     let totalRefund = 0;
@@ -243,11 +295,10 @@ function updateResults(sumRemaining) {
     const jewel2 = (c2 * 300).toFixed(0);
     const jewel3 = (c3 * 300).toFixed(0);
 
-    // 색상 처리 함수
-    const color = (v) => v >= 0 ? "green" : "red";
+    const color = v => v >= 0 ? "green" : "red";
 
     let html = `
-        <table>
+        <table id="result-table">
             <thead>
                 <tr>
                     <th>구분</th>
@@ -284,11 +335,11 @@ function updateResults(sumRemaining) {
 }
 
 /* ============================
-   🔵 툴팁 (클릭 토글)
+   🔵 툴팁
 ============================ */
 function toggleTooltip() {
     const box = document.getElementById("tooltip-box");
-    box.style.display = (box.style.display === "block") ? "none" : "block";
+    box.style.display = box.style.display === "block" ? "none" : "block";
 }
 
 /* ============================
