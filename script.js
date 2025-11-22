@@ -1,323 +1,331 @@
 /* ===============================
-   데이터 로드 (data.js에서 rewardData 사용)
-================================ */
+   IMAGE MAP
+=============================== */
+
+const imageMap = {
+    "2_80": ["images/2_80_1.png", "images/2_80_2.png"],
+    "2_120": ["images/2_120_1.png"],
+    "2_240": ["images/2_240_1.png", "images/2_240_2.png"],
+    "3_80": ["images/3_80_1.png", "images/3_80_2.png"],
+    "3_160": ["images/3_160_1.png"]
+};
+
+/* ===============================
+   REWARD TABLE DATA
+=============================== */
+
+const rewardData = {
+    "3_80":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:1,price:540},
+        {name:"B",count:2,price:270},
+        {name:"C",count:3,price:180},
+        {name:"D",count:4,price:135},
+        {name:"E",count:20,price:27},
+        {name:"F",count:20,price:27},
+        {name:"G",count:30,price:18}
+    ],
+    "2_240":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:2,price:540},
+        {name:"B",count:4,price:270},
+        {name:"C",count:9,price:120},
+        {name:"D",count:15,price:72},
+        {name:"E",count:30,price:36},
+        {name:"F",count:33,price:12},
+        {name:"G",count:90,price:12}
+    ],
+    "2_80":[
+        {name:"최종보상",count:1,price:360},
+        {name:"A",count:1,price:360},
+        {name:"B",count:2,price:180},
+        {name:"C",count:3,price:120},
+        {name:"D",count:4,price:90},
+        {name:"E",count:20,price:18},
+        {name:"F",count:20,price:18},
+        {name:"G",count:30,price:12}
+    ],
+    "2_120":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:1,price:540},
+        {name:"B",count:3,price:180},
+        {name:"C",count:6,price:90},
+        {name:"D",count:10,price:54},
+        {name:"E",count:30,price:18},
+        {name:"F",count:30,price:18},
+        {name:"G",count:40,price:12}
+    ],
+    "3_160":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:2,price:540},
+        {name:"B",count:3,price:360},
+        {name:"C",count:6,price:180},
+        {name:"D",count:9,price:120},
+        {name:"E",count:40,price:27},
+        {name:"F",count:40,price:27},
+        {name:"G",count:60,price:18}
+    ]
+};
+
+/* ===============================
+   GLOBAL STATE
+=============================== */
+
 let selectedTicket = null;
 let selectedBox = null;
 
-/* 필요한 예시 목록 추출 */
-function getValidBoxes(ticket) {
-    return Object.keys(rewardData)
-        .filter(key => key.startsWith(ticket + "_"))
-        .map(key => Number(key.split("_")[1]));
-}
-
 /* ===============================
-   버튼 클릭 설정
-================================ */
+   BUTTON ACTIVATION LOGIC
+=============================== */
+
 document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-        selectedTicket = Number(btn.dataset.ticket);
-
-        /* 티켓 단가 선택 표시 */
-        document.querySelectorAll("#ticketButtons .select-btn")
-            .forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        /* 상자 개수 버튼을 조건에 맞게 활성/비활성 */
-        setBoxButtonState();
-
-        /* 표 초기화 */
-        document.getElementById("table-area").innerHTML = "";
-        document.getElementById("required-box").innerHTML = "";
-        document.getElementById("result-area").innerHTML = "";
+        selectedTicket = btn.dataset.ticket;
+        updateButtonState();
     });
 });
 
-/* ===============================
-   상자 개수 버튼 상태 구성
-================================ */
-function setBoxButtonState() {
-    const boxButtons = document.querySelectorAll("#boxButtons .select-btn");
-    const validBoxes = getValidBoxes(selectedTicket);
-
-    boxButtons.forEach(b => {
-        const val = Number(b.dataset.box);
-        if (validBoxes.includes(val)) {
-            b.classList.remove("disabled-btn");
-            b.disabled = false;
-        } else {
-            b.classList.add("disabled-btn");
-            b.disabled = true;
+document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        if (!btn.classList.contains("disabled-btn")) {
+            selectedBox = btn.dataset.box;
+            updateButtonState();
+            renderTable();
+            renderImages();
         }
-        b.classList.remove("active");
     });
+});
+
+function updateButtonState() {
+    const ticketBtns = document.querySelectorAll("#ticketButtons .select-btn");
+    const boxBtns = document.querySelectorAll("#boxButtons .select-btn");
+
+    ticketBtns.forEach(btn => btn.classList.remove("active"));
+    boxBtns.forEach(btn => {
+        btn.classList.remove("active","disabled-btn");
+        btn.disabled = false;
+    });
+
+    if (selectedTicket) {
+        document.querySelector(`#ticketButtons button[data-ticket="${selectedTicket}"]`).classList.add("active");
+        
+        boxBtns.forEach(btn => {
+            const key = `${selectedTicket}_${btn.dataset.box}`;
+            if (!rewardData[key]) {
+                btn.classList.add("disabled-btn");
+                btn.disabled = true;
+            }
+        });
+    }
+
+    if (selectedBox) {
+        const activeBoxBtn = document.querySelector(`#boxButtons button[data-box="${selectedBox}"]`);
+        if (activeBoxBtn) activeBoxBtn.classList.add("active");
+    }
 }
 
 /* ===============================
-   상자 개수 클릭
-================================ */
-document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        if (btn.disabled) return;
+   RENDER REWARD TABLE
+=============================== */
 
-        selectedBox = Number(btn.dataset.box);
-
-        /* 선택 표시 */
-        document.querySelectorAll("#boxButtons .select-btn")
-            .forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        buildTable();
-    });
-});
-
-/* ===============================
-   표 생성
-================================ */
-function buildTable() {
-
+function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
-    const rows = rewardData[key];
+    const data = rewardData[key];
 
-    if (!rows) {
-        document.getElementById("table-area").innerHTML =
-            `<div style="color:red; font-size:20px; margin-top:20px;">만족하는 상자 없음</div>`;
+    const area = document.getElementById("table-area");
+    area.innerHTML = "";
+
+    if (!data) {
+        area.innerHTML = `<p style="color:red; text-align:center;">만족하는 상자 없음</p>`;
+        document.getElementById("result-area").innerHTML = "";
+        document.getElementById("required-box").innerHTML = "";
         return;
     }
 
     let html = `
-    <table>
-        <tr>
-            <th>보상 종류</th>
-            <th>남은 개수 <span class="tooltip-icon">?</span>
-                <span class="tooltip-box">현재 이벤트 창의 수량을 직접 입력하세요.</span>
-            </th>
-            <th>전체 개수</th>
-            <th>단가</th>
-            <th>점수</th>
-            <th>티켓화</th>
-        </tr>
+        <table>
+            <tr>
+                <th>보상 종류</th>
+                <th>남은 개수 ?</th>
+                <th>전체 개수</th>
+                <th>단가</th>
+                <th>점수</th>
+                <th>티켓화</th>
+            </tr>
     `;
 
-    rows.forEach((r, idx) => {
-        const total = r.count;
-
-        /* 드롭다운 목록 생성 */
-        let listHtml = "";
-        for (let i = 0; i <= total; i++) {
-            listHtml += `<div class="dropdown-item" data-value="${i}" data-idx="${idx}">${i}</div>`;
-        }
-
-        /* 최종보상 고정 */
-        let inputHtml = "";
-        let dropdownHtml = "";
-
-        if (idx === 0) {
-            inputHtml = `<input type="number" id="remain_${idx}" value="1" readonly />`;
-        } else {
-            inputHtml = `<input type="number" id="remain_${idx}" value="0" />`;
-            dropdownHtml = `
-                <div class="dropdown-btn" data-idx="${idx}">▼</div>
-                <div class="dropdown-list" id="list_${idx}" style="display:none;">
-                    ${listHtml}
-                </div>
-            `;
-        }
+    data.forEach((item, i) => {
+        const max = item.count;
+        const isFinal = (item.name === "최종보상");
+        const inputField = isFinal
+            ? `<input type="number" value="1" readonly />`
+            : `<div class="dropdown-wrapper">
+                    <input class="remain-input" data-row="${i}" type="number" value="${max}" min="0" max="${max}">
+                    <div class="dropdown-btn" onclick="toggleDropdown(${i})">▼</div>
+                    <div class="dropdown-list" id="drop-${i}" style="display:none;">
+                        ${Array.from({ length: max + 1 }, (_, n) => `<div class="dropdown-item" onclick="selectRemain(${i},${n})">${n}</div>`).join("")}
+                    </div>
+               </div>`;
 
         html += `
-        <tr>
-            <td>${r.name}</td>
-            <td class="input-cell">
-                <div class="dropdown-wrapper">
-                    ${inputHtml}
-                    ${dropdownHtml}
-                </div>
-            </td>
-            <td>${total}</td>
-            <td>${r.price}</td>
-            <td id="score_${idx}">0</td>
-            <td id="ticket_${idx}">0</td>
-        </tr>
+            <tr>
+                <td>${item.name}</td>
+                <td class="input-cell">${inputField}</td>
+                <td>${item.count}</td>
+                <td>${item.price}</td>
+                <td class="score-cell"></td>
+                <td class="ticket-cell"></td>
+            </tr>
         `;
     });
 
-    /* 합계 행 */
-    const totalCount = rows.slice(1).reduce((sum, r) => sum + r.count, 0);
+    html += `</table>`;
+    area.innerHTML = html;
 
-    html += `
-        <tr style="background:#e3f2fd; font-weight:bold;">
-            <td>합계</td>
-            <td id="sumRemain">0</td>
-            <td>${totalCount}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-    </table>
-    `;
+    calculate();
+}
 
-    document.getElementById("table-area").innerHTML = html;
+window.selectRemain = function (row, val) {
+    const input = document.querySelector(`input[data-row="${row}"]`);
+    input.value = val;
+    closeAllDropdowns();
+    calculate();
+};
 
-    activateDropdowns(rows);
-    setupManualInput(rows);
+window.toggleDropdown = function (row) {
+    closeAllDropdowns();
+    document.getElementById(`drop-${row}`).style.display = "block";
+};
 
-    calculateAll(rows);
+function closeAllDropdowns() {
+    document.querySelectorAll(".dropdown-list").forEach(e => e.style.display = "none");
 }
 
 /* ===============================
-   드롭다운 기능
-================================ */
-function activateDropdowns(rows) {
+   CALCULATION LOGIC
+=============================== */
 
-    document.querySelectorAll(".dropdown-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
+function calculate() {
+    const key = `${selectedTicket}_${selectedBox}`;
+    const data = rewardData[key];
+    if (!data) return;
 
-            /* 모든 드롭다운 닫기 */
-            document.querySelectorAll(".dropdown-list").forEach(l => l.style.display = "none");
-
-            const idx = btn.dataset.idx;
-            const list = document.getElementById("list_" + idx);
-            list.style.display = (list.style.display === "block" ? "none" : "block");
-        });
+    let remains = [];
+    document.querySelectorAll(".remain-input").forEach((inp, i) => {
+        let max = data[i+1].count;
+        let v = Math.min(Number(inp.value), max);
+        inp.value = v;
+        remains[i+1] = v;
     });
 
-    /* 항목 클릭 */
-    document.querySelectorAll(".dropdown-item").forEach(item => {
-        item.addEventListener("click", () => {
-            const idx = item.dataset.idx;
-            const value = Number(item.dataset.value);
-
-            const input = document.getElementById("remain_" + idx);
-            input.value = value;
-
-            document.getElementById("list_" + idx).style.display = "none";
-
-            calculateAll(rows);
-        });
-    });
-}
-
-/* ===============================
-   직접 입력 기능
-================================ */
-function setupManualInput(rows) {
-
-    rows.forEach((r, idx) => {
-
-        if (idx === 0) return; // 최종보상 제외
-
-        const input = document.getElementById(`remain_${idx}`);
-        const maxVal = r.count;
-
-        input.addEventListener("input", () => {
-            let v = Number(input.value);
-
-            if (isNaN(v) || v < 0) v = 0;
-            if (v > maxVal) v = maxVal;
-
-            input.value = v;
-            calculateAll(rows);
-        });
-    });
-}
-
-/* ===============================
-   계산
-================================ */
-function calculateAll(rows) {
-
-    let totalRemain = 0;
-
-    rows.forEach((r, idx) => {
-
-        let remain = Number(document.getElementById(`remain_${idx}`).value);
-        if (idx !== 0) totalRemain += remain;
-
-        const score = remain * r.price;
-        const ticket = score / 30;
-
-        document.getElementById(`score_${idx}`).textContent = score.toFixed(0);
-        document.getElementById(`ticket_${idx}`).textContent = ticket.toFixed(1);
-    });
-
-    document.getElementById("sumRemain").textContent = totalRemain;
-
-    buildRequiredTicket(totalRemain);
-    buildResultTable(rows, totalRemain);
-}
-
-/* ===============================
-   전부 획득 시 필요한 티켓
-================================ */
-function buildRequiredTicket(sumRemain) {
-    const needed = selectedTicket * sumRemain;
+    let totalRemain = remains.reduce((a,b)=>a+b,0);
+    let required = totalRemain * Number(selectedTicket);
 
     document.getElementById("required-box").innerHTML = `
-        <div style="margin-top:18px; font-size:20px;">
-            <b>전부 획득 시 필요한 티켓:</b> ${needed}
+        <div style="text-align:center; margin:15px 0; font-size:18px; font-weight:bold;">
+            전부 획득 시 필요한 티켓 → <span style="color:red">${required}</span>
         </div>
     `;
+
+    document.querySelectorAll("tr").forEach((row, i) => {
+        if (i === 0 || !data[i-1]) return;
+        const item = data[i-1];
+        const remain = i === 1 ? 1 : remains[i-1];
+        const score = item.price * remain;
+        const ticket = (score / 30).toFixed(1);
+
+        row.querySelector(".score-cell").textContent = score;
+        row.querySelector(".ticket-cell").textContent = ticket;
+    });
+
+    renderResult(required);
 }
 
 /* ===============================
-   아래 결과표
-================================ */
-function buildResultTable(rows, sumRemain) {
+   RESULT TABLE
+=============================== */
 
-    const needed = selectedTicket * sumRemain;
+function renderResult(required) {
+    const rows = document.querySelectorAll("tr");
+    let tickets = [];
+    let excludeFinal = 0;
+    let excludeA = 0;
 
-    /* 전체 티켓화 합 */
-    const totalTickets = rows.reduce((s, r, i) =>
-        s + (Number(document.getElementById(`ticket_${i}`).textContent)), 0);
+    rows.forEach((row, i) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length === 6) {
+            const name = cells[0].textContent;
+            const t = parseFloat(cells[5].textContent) || 0;
+            tickets.push(t);
+            if (name !== "최종보상") excludeFinal += t;
+            if (name !== "최종보상" && name !== "A") excludeA += t;
+        }
+    });
 
-    /* 최종보상 제외 */
-    const exceptFinal = rows.slice(1).reduce((s, r, i) =>
-        s + Number(document.getElementById(`ticket_${i+1}`).textContent), 0);
+    let total = tickets.reduce((a,b)=>a+b,0);
 
-    /* 최종 & A 제외 */
-    const exceptFA = rows.slice(2).reduce((s, r, i) =>
-        s + Number(document.getElementById(`ticket_${i+2}`).textContent), 0);
+    const calc = (val) => ({
+        profit: (val - required),
+        gem: (val - required) * 300
+    });
 
-    /* 손익 */
-    const p1 = totalTickets - needed;
-    const p2 = exceptFinal - needed;
-    const p3 = exceptFA - needed;
+    const c1 = calc(total);
+    const c2 = calc(excludeFinal);
+    const c3 = calc(excludeA);
 
-    /* 보석 가치 */
-    const j1 = p1 * 300;
-    const j2 = p2 * 300;
-    const j3 = p3 * 300;
+    const fmt = (v) => v >= 0 ? `<span class="green">${v}</span>` : `<span class="red">${v}</span>`;
 
-    function color(v) {
-        return v >= 0 ? "green" : "red";
-    }
-
-    const html = `
-    <table style="margin-top:20px;">
-        <tr><th>구분</th><th>전부 반환</th><th>최종 제외</th><th>최종 & A 제외</th></tr>
-
+    document.getElementById("result-area").innerHTML = `
+    <table>
+        <tr>
+            <th>구분</th><th>전부 반환</th><th>최종 제외</th><th>최종 & A 제외</th>
+        </tr>
         <tr>
             <td>반환 시 돌려받는 티켓</td>
-            <td>${totalTickets.toFixed(1)}</td>
-            <td>${exceptFinal.toFixed(1)}</td>
-            <td>${exceptFA.toFixed(1)}</td>
+            <td>${total.toFixed(1)}</td>
+            <td>${excludeFinal.toFixed(1)}</td>
+            <td>${excludeA.toFixed(1)}</td>
         </tr>
-
         <tr>
             <td>티켓 손익</td>
-            <td class="${color(p1)}">${p1.toFixed(1)}</td>
-            <td class="${color(p2)}">${p2.toFixed(1)}</td>
-            <td class="${color(p3)}">${p3.toFixed(1)}</td>
+            <td>${fmt(c1.profit.toFixed(1))}</td>
+            <td>${fmt(c2.profit.toFixed(1))}</td>
+            <td>${fmt(c3.profit.toFixed(1))}</td>
         </tr>
-
         <tr>
             <td>보석 가치</td>
-            <td class="${color(j1)}">${j1.toFixed(0)}</td>
-            <td class="${color(j2)}">${j2.toFixed(0)}</td>
-            <td class="${color(j3)}">${j3.toFixed(0)}</td>
+            <td>${fmt(c1.gem)}</td>
+            <td>${fmt(c2.gem)}</td>
+            <td>${fmt(c3.gem)}</td>
         </tr>
-    </table>
-    `;
-
-    document.getElementById("result-area").innerHTML = html;
+    </table>`;
 }
+
+/* ===============================
+   IMAGE RENDERING
+=============================== */
+
+function renderImages() {
+    const key = `${selectedTicket}_${selectedBox}`;
+    const images = imageMap[key];
+
+    const area = document.getElementById("image-area");
+    if (!area) {
+        const div = document.createElement("div");
+        div.id = "image-area";
+        div.style.textAlign = "right";
+        div.style.marginTop = "-140px";
+        div.style.marginBottom = "40px";
+        document.querySelector(".container").prepend(div);
+    }
+
+    if (!images) {
+        imageArea.innerHTML = "";
+        return;
+    }
+
+    imageArea.innerHTML = images.map(src =>
+        `<img src="${src}" style="width:90px; margin-left:8px;">`
+    ).join("");
+}
+
