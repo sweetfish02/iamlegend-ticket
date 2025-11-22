@@ -309,22 +309,22 @@ function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
 
-    const area = document.getElementById("image-area");
+    let area = document.getElementById("image-area");
     if (!area) {
-        const div = document.createElement("div");
-        div.id = "image-area";
-        div.style.textAlign = "right";
-        div.style.marginTop = "-140px";
-        div.style.marginBottom = "40px";
-        document.querySelector(".container").prepend(div);
+        area = document.createElement("div");
+        area.id = "image-area";
+        area.style.textAlign = "right";
+        area.style.marginTop = "-140px";
+        area.style.marginBottom = "40px";
+        document.querySelector(".container").prepend(area);
     }
 
     if (!images) {
-        imageArea.innerHTML = "";
+        area.innerHTML = "";
         return;
     }
 
-    imageArea.innerHTML = images.map(src =>
+    area.innerHTML = images.map(src =>
         `<img src="${src}" style="width:90px; margin-left:8px;">`
     ).join("");
 }
