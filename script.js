@@ -1,7 +1,6 @@
 /* ===============================
    IMAGE MAP
 =============================== */
-
 const imageMap = {
     "2_80": ["images/2_80_1.png", "images/2_80_2.png"],
     "2_120": ["images/2_120_1.png"],
@@ -11,78 +10,20 @@ const imageMap = {
 };
 
 /* ===============================
-   REWARD TABLE DATA
-=============================== */
-
-const rewardData = {
-    "3_80":[
-        {name:"최종보상",count:1,price:540},
-        {name:"A",count:1,price:540},
-        {name:"B",count:2,price:270},
-        {name:"C",count:3,price:180},
-        {name:"D",count:4,price:135},
-        {name:"E",count:20,price:27},
-        {name:"F",count:20,price:27},
-        {name:"G",count:30,price:18}
-    ],
-    "2_240":[
-        {name:"최종보상",count:1,price:540},
-        {name:"A",count:2,price:540},
-        {name:"B",count:4,price:270},
-        {name:"C",count:9,price:120},
-        {name:"D",count:15,price:72},
-        {name:"E",count:30,price:36},
-        {name:"F",count:33,price:12},
-        {name:"G",count:90,price:12}
-    ],
-    "2_80":[
-        {name:"최종보상",count:1,price:360},
-        {name:"A",count:1,price:360},
-        {name:"B",count:2,price:180},
-        {name:"C",count:3,price:120},
-        {name:"D",count:4,price:90},
-        {name:"E",count:20,price:18},
-        {name:"F",count:20,price:18},
-        {name:"G",count:30,price:12}
-    ],
-    "2_120":[
-        {name:"최종보상",count:1,price:540},
-        {name:"A",count:1,price:540},
-        {name:"B",count:3,price:180},
-        {name:"C",count:6,price:90},
-        {name:"D",count:10,price:54},
-        {name:"E",count:30,price:18},
-        {name:"F",count:30,price:18},
-        {name:"G",count:40,price:12}
-    ],
-    "3_160":[
-        {name:"최종보상",count:1,price:540},
-        {name:"A",count:2,price:540},
-        {name:"B",count:3,price:360},
-        {name:"C",count:6,price:180},
-        {name:"D",count:9,price:120},
-        {name:"E",count:40,price:27},
-        {name:"F",count:40,price:27},
-        {name:"G",count:60,price:18}
-    ]
-};
-
-/* ===============================
    GLOBAL STATE
 =============================== */
-
 let selectedTicket = null;
 let selectedBox = null;
 
 /* ===============================
    BUTTON ACTIVATION LOGIC
 =============================== */
-
 document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         selectedTicket = btn.dataset.ticket;
-        selectedBox = null;  // 초기화
+        selectedBox = null;
         updateButtonState();
+        clearTables();
     });
 });
 
@@ -127,9 +68,19 @@ function updateButtonState() {
 }
 
 /* ===============================
+   CLEAR TABLES
+=============================== */
+function clearTables() {
+    document.getElementById("table-area").innerHTML = "";
+    document.getElementById("result-area").innerHTML = "";
+    document.getElementById("required-box").innerHTML = "";
+    const imgArea = document.getElementById("image-area");
+    if (imgArea) imgArea.innerHTML = "";
+}
+
+/* ===============================
    RENDER REWARD TABLE
 =============================== */
-
 function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -139,8 +90,7 @@ function renderTable() {
 
     if (!data) {
         area.innerHTML = `<p style="color:red; text-align:center;">만족하는 상자 없음</p>`;
-        document.getElementById("result-area").innerHTML = "";
-        document.getElementById("required-box").innerHTML = "";
+        clearTables();
         return;
     }
 
@@ -172,7 +122,7 @@ function renderTable() {
                     `).join("")}
                 </div>
             </div>`;
-
+        
         html += `
             <tr>
                 <td>${item.name}</td>
@@ -207,9 +157,8 @@ function closeAllDropdowns() {
 }
 
 /* ===============================
-   CALCULATION LOGIC (FIXED)
+   CALCULATION LOGIC
 =============================== */
-
 function calculate() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -218,10 +167,10 @@ function calculate() {
     let remains = [];
 
     document.querySelectorAll(".remain-input").forEach((inp, i) => {
-        let max = data[i + 1].count; 
+        let max = data[i + 1].count;
         let v = Math.min(Number(inp.value), max);
         inp.value = v;
-        remains.push(v); // FIXED
+        remains.push(v);
     });
 
     const totalRemain = remains.reduce((a, b) => a + b, 0);
@@ -235,6 +184,7 @@ function calculate() {
 
     document.querySelectorAll("tr").forEach((row, i) => {
         if (i === 0 || !data[i - 1]) return;
+
         const item = data[i - 1];
         const remain = i === 1 ? 1 : remains[i - 1];
 
@@ -251,7 +201,6 @@ function calculate() {
 /* ===============================
    RESULT TABLE
 =============================== */
-
 function renderResult(required) {
     const rows = document.querySelectorAll("tr");
     let totals = [];
@@ -273,17 +222,14 @@ function renderResult(required) {
     const total = totals.reduce((a, b) => a + b, 0);
 
     function calc(val) {
-        return {
-            profit: val - required,
-            gem: (val - required) * 300
-        };
+        return { profit: val - required, gem: (val - required) * 300 };
     }
 
     const c1 = calc(total);
     const c2 = calc(excludeFinal);
     const c3 = calc(excludeA);
 
-    const fmt = v => 
+    const fmt = v =>
         v >= 0 ? `<span class="green">${v}</span>` : `<span class="red">${v}</span>`;
 
     document.getElementById("result-area").innerHTML = `
@@ -312,14 +258,12 @@ function renderResult(required) {
             <td>${fmt(c2.gem)}</td>
             <td>${fmt(c3.gem)}</td>
         </tr>
-    </table>
-    `;
+    </table>`;
 }
 
 /* ===============================
-   IMAGE RENDERING (FIXED)
+   IMAGE RENDERING
 =============================== */
-
 function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
