@@ -11,24 +11,15 @@ body {
     max-width: 900px;
     margin: auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.15);
-    position: relative;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     font-size: 34px;
     font-weight: 800;
 }
 
-/* 이미지 영역 */
-#image-area {
-    text-align: right;
-    margin-top: -20px;
-    margin-bottom: 10px;
-}
-
-/* 선택 영역 */
 .selector-block {
     margin-bottom: 18px;
 }
@@ -76,7 +67,6 @@ th {
     color: white;
     padding: 8px;
     border: 1px solid #555;
-    text-align: center;
 }
 
 td {
@@ -89,18 +79,21 @@ td {
     background: #fff8c4;
 }
 
-/* 네모 입력 박스 가운데 정렬 */
-.input-cell input {
+input[type="number"] {
+    width: 90px;     /* ← 너비 통일 */
+    background: #fff8c4;
     text-align: center;
-    margin: auto;
-    display: block;
+    font-size: 16px;
+    padding-right: 24px;
 }
 
 /* 드롭다운 */
 .dropdown-wrapper {
     position: relative;
-    width: 90px;
-    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;   /* ← 최종보상 input 과 동일 */
 }
 
 .dropdown-btn {
@@ -116,7 +109,7 @@ td {
 
 .dropdown-list {
     position: absolute;
-    top: 36px;
+    top: 38px;
     left: 50%;
     transform: translateX(-50%);
     width: 90px;
@@ -145,18 +138,11 @@ td {
     color: green;
 }
 
-/* 툴팁 아이콘 */
-.help-icon {
-    font-weight: bold;
-    cursor: pointer;
-    color: yellow;
-}
-
 /* 제작자 문구 */
-.creator-note {
+#creator-tag {
+    margin-top: 40px;
     text-align: center;
-    font-size: 12px;
-    color: #999;
-    margin-top: 60px;
-    line-height: 1.6;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.4;
 }
