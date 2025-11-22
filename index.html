@@ -2,13 +2,16 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <title>티켓 계산기</title>
+    <title>티켓 계산기 (완성본)</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
     <div class="container">
         <h1>티켓 계산기</h1>
+
+        <!-- 이미지 표시 영역 -->
+        <div id="image-area"></div>
 
         <!-- 티켓 단가 선택 -->
         <div class="selector-block">
@@ -30,9 +33,6 @@
             </div>
         </div>
 
-        <!-- 이미지 영역 -->
-        <div id="image-area"></div>
-
         <!-- 중간표 -->
         <div id="table-area"></div>
 
@@ -42,15 +42,15 @@
         <!-- 결과 표 -->
         <div id="result-area"></div>
 
-        <!-- 제작자 정보 -->
-        <div id="creator-box">
-            <div class="creator-line">Created by <b>은어Leͥgeͣnͫd</b></div>
-            <div class="creator-line">Belongs to Guild <b>[Leͥgeͣnͫd] / 60632</b></div>
+        <!-- 제작자 문구 (결과표 아래로 이동) -->
+        <div class="creator-note">
+            Created by <strong>은어Leͥgeͣnͫd</strong><br>
+            Belongs to Guild <strong>[Leͥgeͣnͫd] / 60632</strong>
         </div>
 
     </div>
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+    <script src="data.js?v=1"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
