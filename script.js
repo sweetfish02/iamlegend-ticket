@@ -101,7 +101,7 @@ function renderTable() {
             `;
 
         html += `
-            <tr>
+            <tr class="reward-row" data-index="${i}">
                 <td>${item.name}</td>
                 <td class="yellow-cell">${inputField}</td>
                 <td>${item.count}</td>
@@ -115,7 +115,7 @@ function renderTable() {
     /* 합계행 */
     const totalCount = data.slice(1).reduce((s,x)=>s+x.count, 0);
     html += `
-        <tr>
+        <tr id="sum-row">
             <td>A~G 의 합계</td>
             <td id="sum-remain" class="yellow-cell"></td>
             <td>${totalCount}</td>
@@ -138,7 +138,7 @@ function renderTable() {
         });
     });
 
-    /* 드롭다운 버튼 클릭 시 열기 */
+    /* 드롭다운 버튼 */
     document.querySelectorAll(".dropdown-btn").forEach((btn, i) => {
         btn.addEventListener("click", () => {
             closeDropdowns();
@@ -160,24 +160,27 @@ function selectRemain(i, val) {
     calculate();
 }
 
-/* 계산 */
+/* 계산 로직 */
 function calculate() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
 
+    /* A~G 남은 개수 */
     let remains = [];
     document.querySelectorAll(".remain-input").forEach((inp, i) => {
         remains[i] = Number(inp.value);
     });
 
+    /* 합계 */
     const sumRemain = remains.reduce((s,x)=>s+x, 0);
     document.getElementById("sum-remain").textContent = sumRemain;
 
-    document.querySelectorAll("#table-area tr").forEach((row, i) => {
-        if (i === 0 || i > data.length) return;
+    /* 점수 / 티켓화 정확한 행 매칭 계산 */
+    document.querySelectorAll(".reward-row").forEach(row => {
+        const index = Number(row.dataset.index);
+        const item = data[index];
 
-        const item = data[i-1];
-        const remain = item.name === "최종보상" ? 1 : remains[i-1];
+        const remain = item.name === "최종보상" ? 1 : remains[index];
         const score = item.price * remain;
         const ticket = (score / 30).toFixed(1);
 
@@ -192,31 +195,28 @@ function calculate() {
 function renderResult(required) {
     const area = document.getElementById("result-area");
 
-    let rows = document.querySelectorAll("#table-area tr");
     let totals = [];
     let excludeFinal = 0;
     let excludeA = 0;
 
-    rows.forEach((row, i) => {
-        const cells = row.querySelectorAll("td");
-        if (cells.length === 6) {
-            const name = cells[0].textContent;
-            const t = parseFloat(cells[5].textContent) || 0;
-
-            totals.push(t);
-            if (name !== "최종보상") excludeFinal += t;
-            if (name !== "최종보상" && name !== "A") excludeA += t;
-        }
+    document.querySelectorAll(".reward-row").forEach(row => {
+        const name = row.children[0].textContent;
+        const t = parseFloat(row.querySelector(".ticket-cell").textContent) || 0;
+        totals.push(t);
+        if (name !== "최종보상") excludeFinal += t;
+        if (name !== "최종보상" && name !== "A") excludeA += t;
     });
 
-    function calc(val) {
+    const totalReturn = totals.reduce((a,b)=>a+b,0);
+
+    function calc(val){
         return {
             profit: val - required,
             gem: (val - required) * 300
         };
     }
 
-    const c1 = calc(totals.reduce((a,b)=>a+b,0));
+    const c1 = calc(totalReturn);
     const c2 = calc(excludeFinal);
     const c3 = calc(excludeA);
 
@@ -234,7 +234,7 @@ function renderResult(required) {
         </tr>
         <tr>
             <td class="purple">돌려받는 티켓</td>
-            <td>${(totals.reduce((a,b)=>a+b,0)).toFixed(1)}</td>
+            <td>${totalReturn.toFixed(1)}</td>
             <td>${excludeFinal.toFixed(1)}</td>
             <td>${excludeA.toFixed(1)}</td>
         </tr>
