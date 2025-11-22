@@ -75,25 +75,19 @@ td {
     text-align: center;
 }
 
-.input-cell {
-    background: #fff8c4;
-}
-
+/* 같은 너비 + 가운데정렬 */
 input[type="number"] {
-    width: 90px;     /* ← 너비 통일 */
-    background: #fff8c4;
-    text-align: center;
+    width: 120px;
+    height: 28px;
     font-size: 16px;
-    padding-right: 24px;
+    text-align: center;
 }
 
-/* 드롭다운 */
+/* 드롭다운 래퍼 */
 .dropdown-wrapper {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 90px;   /* ← 최종보상 input 과 동일 */
+    width: 130px;
+    margin: auto;
 }
 
 .dropdown-btn {
@@ -103,46 +97,52 @@ input[type="number"] {
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 18px;
-    user-select: none;
-    color: #444;
 }
 
 .dropdown-list {
     position: absolute;
-    top: 38px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90px;
+    width: 100%;
+    top: 36px;
     background: white;
     border: 1px solid #aaa;
-    max-height: 160px;
+    max-height: 150px;
     overflow-y: auto;
-    z-index: 999;
+    z-index: 20;
 }
 
 .dropdown-item {
-    padding: 6px;
+    padding: 5px;
     cursor: pointer;
-    text-align: center;
 }
-
 .dropdown-item:hover {
     background: #eee;
 }
 
-.red {
-    color: red;
-}
-
-.green {
-    color: green;
-}
-
 /* 제작자 문구 */
-#creator-tag {
+#creator {
     margin-top: 40px;
     text-align: center;
-    color: #666;
     font-size: 13px;
-    line-height: 1.4;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* tooltip */
+.tooltip {
+    display: inline-block;
+    margin-left: 4px;
+    cursor: pointer;
+    color: #1e88e5;
+    font-weight: bold;
+}
+
+.tooltip-box {
+    display: none;
+    position: absolute;
+    background: #fff;
+    border: 1px solid #666;
+    padding: 8px;
+    font-size: 13px;
+    z-index: 100;
+    border-radius: 6px;
 }
