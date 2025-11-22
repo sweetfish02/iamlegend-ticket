@@ -12,9 +12,7 @@ const imageMap = {
 let selectedTicket = null;
 let selectedBox = null;
 
-/* ===============================
-   버튼 선택
-=============================== */
+/* 버튼 */
 document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         selectedTicket = btn.dataset.ticket;
@@ -34,9 +32,7 @@ document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
     });
 });
 
-/* ===============================
-   버튼 활성화 표시
-=============================== */
+/* 버튼 활성화 */
 function updateButtonState() {
     const ticketBtns = document.querySelectorAll("#ticketButtons .select-btn");
     const boxBtns = document.querySelectorAll("#boxButtons .select-btn");
@@ -64,9 +60,7 @@ function updateButtonState() {
     }
 }
 
-/* ===============================
-   테이블 생성
-=============================== */
+/* 테이블 생성 */
 function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -97,8 +91,8 @@ function renderTable() {
             ? `<input type="number" value="1" readonly>`
             : `
                 <div class="dropdown-wrapper yellow-cell">
-                    <input type="number" class="remain-input" data-row="${index}" value="${max}" min="0" max="${max}">
-                    <div class="dropdown-btn">▼</div>
+                    <input type="number" class="remain-input" data-index="${index}" value="${max}" min="0" max="${max}">
+                    <div class="dropdown-btn" data-index="${index}">▼</div>
                     <div class="dropdown-list" id="drop-${index}">
                         ${Array.from({ length: max + 1 }, (_, n) =>
                             `<div class="dropdown-item" onclick="selectRemain(${index},${n})">${n}</div>`
@@ -120,7 +114,8 @@ function renderTable() {
     });
 
     /* 합계행 */
-    const totalCount = data.slice(1).reduce((sum, x) => sum + x.count, 0);
+    const totalCount = data.slice(1).reduce((s, x) => s + x.count, 0);
+
     html += `
         <tr id="sum-row">
             <td>A~G 의 합계</td>
@@ -133,7 +128,7 @@ function renderTable() {
     html += `</table>`;
     area.innerHTML = html;
 
-    /* 입력 이벤트 */
+    /* 입력 숫자 이벤트 */
     document.querySelectorAll(".remain-input").forEach(inp => {
         inp.addEventListener("input", () => {
             const max = Number(inp.max);
@@ -145,11 +140,12 @@ function renderTable() {
         });
     });
 
-    /* 드롭다운 이벤트 */
-    document.querySelectorAll(".dropdown-btn").forEach((btn, index) => {
+    /* 드롭다운 버튼 이벤트 — FIXED */
+    document.querySelectorAll(".dropdown-btn").forEach(btn => {
         btn.addEventListener("click", () => {
+            const idx = btn.dataset.index;
             closeDropdowns();
-            document.getElementById(`drop-${index}`).style.display = "block";
+            document.getElementById(`drop-${idx}`).style.display = "block";
         });
     });
 
@@ -160,31 +156,30 @@ function closeDropdowns() {
     document.querySelectorAll(".dropdown-list").forEach(d => d.style.display = "none");
 }
 
-function selectRemain(index, val) {
-    const input = document.querySelector(`input[data-row="${index}"]`);
+function selectRemain(i, val) {
+    const input = document.querySelector(`input[data-index="${i}"]`);
     input.value = val;
     closeDropdowns();
     calculate();
 }
 
-/* ===============================
-   계산
-=============================== */
+/* 계산 */
 function calculate() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
 
     let remains = [];
+
     document.querySelectorAll(".remain-input").forEach(inp => {
-        const idx = Number(inp.dataset.row);
+        const idx = Number(inp.dataset.index);
         remains[idx] = Number(inp.value);
     });
 
     /* 합계 */
-    const sumRemain = remains.reduce((sum, x) => sum + x, 0);
+    const sumRemain = remains.slice(1).reduce((s, x) => s + x, 0);
     document.getElementById("sum-remain").textContent = sumRemain;
 
-    /* 보상별 계산 */
+    /* 점수 / 티켓화 */
     document.querySelectorAll(".reward-row").forEach(row => {
         const idx = Number(row.dataset.index);
         const item = data[idx];
@@ -200,9 +195,7 @@ function calculate() {
     renderResult(sumRemain * Number(selectedTicket));
 }
 
-/* ===============================
-   결과 표
-=============================== */
+/* 결과표 */
 function renderResult(required) {
     const area = document.getElementById("result-area");
 
@@ -213,7 +206,6 @@ function renderResult(required) {
     document.querySelectorAll(".reward-row").forEach(row => {
         const name = row.children[0].textContent;
         const t = parseFloat(row.querySelector(".ticket-cell").textContent) || 0;
-
         totals.push(t);
         if (name !== "최종보상") excludeFinal += t;
         if (name !== "최종보상" && name !== "A") excludeA += t;
@@ -222,9 +214,10 @@ function renderResult(required) {
     const totalReturn = totals.reduce((a, b) => a + b, 0);
 
     function calc(val) {
+        const diff = val - required;
         return {
-            profit: val - required,
-            gem: (val - required) * 300
+            profit: diff,
+            gem: Math.ceil(diff * 300)
         };
     }
 
@@ -264,7 +257,6 @@ function renderResult(required) {
     </table>
     `;
 
-    /* 필요한 티켓 */
     document.getElementById("required-box").innerHTML = `
         <div style="text-align:center; margin:15px 0; font-size:18px; font-weight:bold;">
             전부 획득 시 필요한 티켓 → <span class="purple">${required}</span>
@@ -272,9 +264,7 @@ function renderResult(required) {
     `;
 }
 
-/* ===============================
-   이미지
-=============================== */
+/* 이미지 */
 function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
