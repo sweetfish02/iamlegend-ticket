@@ -10,20 +10,79 @@ const imageMap = {
 };
 
 /* ===============================
+   REWARD TABLE DATA
+=============================== */
+
+const rewardData = {
+    "3_80":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:1,price:540},
+        {name:"B",count:2,price:270},
+        {name:"C",count:3,price:180},
+        {name:"D",count:4,price:135},
+        {name:"E",count:20,price:27},
+        {name:"F",count:20,price:27},
+        {name:"G",count:30,price:18}
+    ],
+    "2_240":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:2,price:540},
+        {name:"B",count:4,price:270},
+        {name:"C",count:9,price:120},
+        {name:"D",count:15,price:72},
+        {name:"E",count:30,price:36},
+        {name:"F",count:33,price:12},
+        {name:"G",count:90,price:12}
+    ],
+    "2_80":[
+        {name:"최종보상",count:1,price:360},
+        {name:"A",count:1,price:360},
+        {name:"B",count:2,price:180},
+        {name:"C",count:3,price:120},
+        {name:"D",count:4,price:90},
+        {name:"E",count:20,price:18},
+        {name:"F",count:20,price:18},
+        {name:"G",count:30,price:12}
+    ],
+    "2_120":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:1,price:540},
+        {name:"B",count:3,price:180},
+        {name:"C",count:6,price:90},
+        {name:"D",count:10,price:54},
+        {name:"E",count:30,price:18},
+        {name:"F",count:30,price:18},
+        {name:"G",count:40,price:12}
+    ],
+    "3_160":[
+        {name:"최종보상",count:1,price:540},
+        {name:"A",count:2,price:540},
+        {name:"B",count:3,price:360},
+        {name:"C",count:6,price:180},
+        {name:"D",count:9,price:120},
+        {name:"E",count:40,price:27},
+        {name:"F",count:40,price:27},
+        {name:"G",count:60,price:18}
+    ]
+};
+
+/* ===============================
    GLOBAL STATE
 =============================== */
+
 let selectedTicket = null;
 let selectedBox = null;
 
 /* ===============================
    BUTTON ACTIVATION LOGIC
 =============================== */
+
 document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         selectedTicket = btn.dataset.ticket;
         selectedBox = null;
         updateButtonState();
-        clearTables();
+        renderImages();
     });
 });
 
@@ -68,19 +127,9 @@ function updateButtonState() {
 }
 
 /* ===============================
-   CLEAR TABLES
+   RENDER TABLE
 =============================== */
-function clearTables() {
-    document.getElementById("table-area").innerHTML = "";
-    document.getElementById("result-area").innerHTML = "";
-    document.getElementById("required-box").innerHTML = "";
-    const imgArea = document.getElementById("image-area");
-    if (imgArea) imgArea.innerHTML = "";
-}
 
-/* ===============================
-   RENDER REWARD TABLE
-=============================== */
 function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -89,11 +138,11 @@ function renderTable() {
     area.innerHTML = "";
 
     if (!data) {
-        area.innerHTML = `<p style="color:red; text-align:center;">만족하는 상자 없음</p>`;
-        clearTables();
+        area.innerHTML = `<p style="text-align:center; color:red;">만족하는 상자 없음</p>`;
         return;
     }
 
+    // 테이블 생성
     let html = `
         <table>
             <tr>
@@ -108,21 +157,22 @@ function renderTable() {
 
     data.forEach((item, i) => {
         const max = item.count;
-        const isFinal = item.name === "최종보상";
+        const isFinal = (item.name === "최종보상");
 
         const inputField = isFinal
             ? `<input type="number" value="1" readonly />`
             : `
-            <div class="dropdown-wrapper">
-                <input class="remain-input" data-row="${i}" type="number" value="${max}" min="0" max="${max}">
-                <div class="dropdown-btn" onclick="toggleDropdown(${i})">▼</div>
-                <div class="dropdown-list" id="drop-${i}" style="display:none;">
-                    ${Array.from({ length: max + 1 }, (_, n) => `
-                        <div class="dropdown-item" onclick="selectRemain(${i}, ${n})">${n}</div>
-                    `).join("")}
+                <div class="dropdown-wrapper">
+                    <input class="remain-input" data-row="${i}" type="number" value="${max}" min="0" max="${max}">
+                    <div class="dropdown-btn" onclick="toggleDropdown(${i})">▼</div>
+                    <div class="dropdown-list" id="drop-${i}" style="display:none;">
+                        ${Array.from({ length: max + 1 }, (_, n) => `
+                            <div class="dropdown-item" onclick="selectRemain(${i},${n})">${n}</div>
+                        `).join("")}
+                    </div>
                 </div>
-            </div>`;
-        
+              `;
+
         html += `
             <tr>
                 <td>${item.name}</td>
@@ -131,7 +181,8 @@ function renderTable() {
                 <td>${item.price}</td>
                 <td class="score-cell"></td>
                 <td class="ticket-cell"></td>
-            </tr>`;
+            </tr>
+        `;
     });
 
     html += `</table>`;
@@ -139,6 +190,10 @@ function renderTable() {
 
     calculate();
 }
+
+/* ===============================
+   DROPDOWN HANDLING
+=============================== */
 
 window.selectRemain = function(row, val) {
     const input = document.querySelector(`input[data-row="${row}"]`);
@@ -159,6 +214,7 @@ function closeAllDropdowns() {
 /* ===============================
    CALCULATION LOGIC
 =============================== */
+
 function calculate() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -182,7 +238,9 @@ function calculate() {
         </div>
     `;
 
-    document.querySelectorAll("tr").forEach((row, i) => {
+    const rows = document.querySelectorAll("tr");
+
+    rows.forEach((row, i) => {
         if (i === 0 || !data[i - 1]) return;
 
         const item = data[i - 1];
@@ -201,6 +259,7 @@ function calculate() {
 /* ===============================
    RESULT TABLE
 =============================== */
+
 function renderResult(required) {
     const rows = document.querySelectorAll("tr");
     let totals = [];
@@ -219,11 +278,12 @@ function renderResult(required) {
         }
     });
 
-    const total = totals.reduce((a, b) => a + b, 0);
+    const total = totals.reduce((a,b)=>a+b,0);
 
-    function calc(val) {
-        return { profit: val - required, gem: (val - required) * 300 };
-    }
+    const calc = val => ({
+        profit: val - required,
+        gem: (val - required) * 300
+    });
 
     const c1 = calc(total);
     const c2 = calc(excludeFinal);
@@ -233,50 +293,44 @@ function renderResult(required) {
         v >= 0 ? `<span class="green">${v}</span>` : `<span class="red">${v}</span>`;
 
     document.getElementById("result-area").innerHTML = `
-    <table>
-        <tr>
-            <th>구분</th>
-            <th>전부 반환</th>
-            <th>최종 제외</th>
-            <th>최종 & A 제외</th>
-        </tr>
-        <tr>
-            <td>돌려받는 티켓</td>
-            <td>${total.toFixed(1)}</td>
-            <td>${excludeFinal.toFixed(1)}</td>
-            <td>${excludeA.toFixed(1)}</td>
-        </tr>
-        <tr>
-            <td>티켓 손익</td>
-            <td>${fmt(c1.profit.toFixed(1))}</td>
-            <td>${fmt(c2.profit.toFixed(1))}</td>
-            <td>${fmt(c3.profit.toFixed(1))}</td>
-        </tr>
-        <tr>
-            <td>보석 가치</td>
-            <td>${fmt(c1.gem)}</td>
-            <td>${fmt(c2.gem)}</td>
-            <td>${fmt(c3.gem)}</td>
-        </tr>
-    </table>`;
+        <table>
+            <tr>
+                <th>구분</th>
+                <th>전부 반환</th>
+                <th>최종 제외</th>
+                <th>최종 & A 제외</th>
+            </tr>
+            <tr>
+                <td>돌려받는 티켓</td>
+                <td>${total.toFixed(1)}</td>
+                <td>${excludeFinal.toFixed(1)}</td>
+                <td>${excludeA.toFixed(1)}</td>
+            </tr>
+            <tr>
+                <td>티켓 손익</td>
+                <td>${fmt(c1.profit.toFixed(1))}</td>
+                <td>${fmt(c2.profit.toFixed(1))}</td>
+                <td>${fmt(c3.profit.toFixed(1))}</td>
+            </tr>
+            <tr>
+                <td>보석 가치</td>
+                <td>${fmt(c1.gem)}</td>
+                <td>${fmt(c2.gem)}</td>
+                <td>${fmt(c3.gem)}</td>
+            </tr>
+        </table>
+    `;
 }
 
 /* ===============================
-   IMAGE RENDERING
+   IMAGE RENDER (NEW POSITION)
 =============================== */
+
 function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
 
-    let area = document.getElementById("image-area");
-    if (!area) {
-        area = document.createElement("div");
-        area.id = "image-area";
-        area.style.textAlign = "right";
-        area.style.marginTop = "-140px";
-        area.style.marginBottom = "40px";
-        document.querySelector(".container").prepend(area);
-    }
+    const area = document.getElementById("image-area");
 
     if (!images) {
         area.innerHTML = "";
@@ -284,6 +338,6 @@ function renderImages() {
     }
 
     area.innerHTML = images
-        .map(src => `<img src="${src}" style="width:90px; margin-left:8px;">`)
+        .map(src => `<img src="${src}">`)
         .join("");
 }
