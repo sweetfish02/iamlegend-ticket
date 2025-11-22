@@ -11,6 +11,7 @@ body {
     max-width: 900px;
     margin: auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    position: relative;
 }
 
 h1 {
@@ -18,6 +19,28 @@ h1 {
     margin-bottom: 25px;
     font-size: 34px;
     font-weight: 800;
+}
+
+/* 제작자 표시 */
+#creator-tag {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    text-align: right;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 이미지 영역 (제목 오른쪽) */
+#image-area {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    text-align: right;
+}
+#image-area img {
+    width: 110px;
+    margin-left: 8px;
 }
 
 .selector-block {
@@ -79,19 +102,21 @@ td {
     background: #fff8c4;
 }
 
+/* 모든 input 가운데 정렬 */
 input[type="number"] {
     width: 70px;
     background: #fff8c4;
     text-align: center;
     font-size: 16px;
     padding-right: 24px;
+    margin: auto;      /* 가운데 배치 */
+    display: block;    /* 셀 중앙정렬 */
 }
 
 /* 드롭다운 */
 .dropdown-wrapper {
     position: relative;
     display: flex;
-    align-items: center;
     justify-content: center;
     width: 90px;
 }
@@ -110,8 +135,6 @@ input[type="number"] {
 .dropdown-list {
     position: absolute;
     top: 38px;
-    left: 50%;
-    transform: translateX(-50%);
     width: 90px;
     background: white;
     border: 1px solid #aaa;
@@ -125,30 +148,9 @@ input[type="number"] {
     cursor: pointer;
     text-align: center;
 }
-
 .dropdown-item:hover {
     background: #eee;
 }
 
-.red {
-    color: red;
-}
-
-.green {
-    color: green;
-}
-
-/* 제작자 문구 */
-#creator-tag {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    text-align: right;
-    font-size: 14px;
-    color: #333;
-}
-
-#creator-tag span {
-    display: block;
-    line-height: 1.3;
-}
+.red { color: red; }
+.green { color: green; }
