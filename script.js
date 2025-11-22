@@ -9,15 +9,10 @@ const imageMap = {
     "3_160": ["images/3_160_1.png"]
 };
 
-/* ===============================
-   GLOBAL
-=============================== */
 let selectedTicket = null;
 let selectedBox = null;
 
-/* ===============================
-   BUTTON EVENT
-=============================== */
+/* 버튼 */
 document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         selectedTicket = btn.dataset.ticket;
@@ -37,9 +32,7 @@ document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
     });
 });
 
-/* ===============================
-   BUTTON STATE
-=============================== */
+/* 버튼 활성화 */
 function updateButtonState() {
     const ticketBtns = document.querySelectorAll("#ticketButtons .select-btn");
     const boxBtns = document.querySelectorAll("#boxButtons .select-btn");
@@ -67,9 +60,7 @@ function updateButtonState() {
     }
 }
 
-/* ===============================
-   TABLE RENDER
-=============================== */
+/* 테이블 생성 */
 function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -80,125 +71,113 @@ function renderTable() {
         return;
     }
 
-    let html =
-        `<table>
-            <thead>
-                <tr>
-                    <th>보상 종류</th>
-                    <th>남은 개수 <span class="tooltip" onclick="showTip(event,'현재 이벤트 창의 수량을 직접 입력하세요.')">?</span></th>
-                    <th>전체 개수</th>
-                    <th>단가</th>
-                    <th>점수</th>
-                    <th>티켓화</th>
-                </tr>
-            </thead>
-            <tbody>
-        `;
+    let html = `
+        <table>
+            <tr>
+                <th>보상 종류</th>
+                <th>남은 개수(현재 수량 직접입력)</th>
+                <th>전체 개수</th>
+                <th>단가</th>
+                <th>점수</th>
+                <th>티켓화</th>
+            </tr>
+    `;
 
     data.forEach((item, i) => {
-        const isFinal = item.name === "최종보상";
         const max = item.count;
+        const isFinal = item.name === "최종보상";
 
         const inputField = isFinal
             ? `<input type="number" value="1" readonly>`
             : `
-                <div class="dropdown-wrapper">
+                <div class="dropdown-wrapper yellow-cell">
                     <input type="number" class="remain-input" data-row="${i}" value="${max}" min="0" max="${max}">
-                    <div class="dropdown-btn" onclick="toggleDropdown(${i})">▼</div>
+                    <div class="dropdown-btn">▼</div>
                     <div class="dropdown-list" id="drop-${i}">
                         ${Array.from({ length: max + 1 }, (_, n) =>
-                            `<div class="dropdown-item" onclick="selectRemain(${i},${n})">${n}</div>`
-                        ).join("")}
+                            `<div class="dropdown-item" onclick="selectRemain(${i},${n})">${n}</div>`).join("")}
                     </div>
-                </div>`;
+                </div>
+            `;
 
         html += `
-            <tr data-index="${i}">
+            <tr>
                 <td>${item.name}</td>
-                <td>${inputField}</td>
+                <td class="yellow-cell">${inputField}</td>
                 <td>${item.count}</td>
                 <td>${item.price}</td>
                 <td class="score-cell"></td>
-                <td class="ticket-cell"></td>
-            </tr>`;
+                <td class="ticket-cell purple"></td>
+            </tr>
+        `;
     });
 
     /* 합계행 */
-    const totalCount = data.slice(1).reduce((s, x) => s + x.count, 0);
-
+    const totalCount = data.slice(1).reduce((s,x)=>s+x.count, 0);
     html += `
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>합계 <span class="tooltip" onclick="showTip(event,'A~G 보상의 합계')">?</span></td>
-                    <td id="sum-remain"></td>
-                    <td>${totalCount}</td>
-                    <td></td><td></td><td></td>
-                </tr>
-            </tfoot>
-        </table>`;
+        <tr>
+            <td>A~G 의 합계</td>
+            <td id="sum-remain" class="yellow-cell"></td>
+            <td>${totalCount}</td>
+            <td></td><td></td><td></td>
+        </tr>
+    `;
 
+    html += `</table>`;
     area.innerHTML = html;
 
-    /* 직접 입력 계산 */
+    /* 입력 이벤트 */
     document.querySelectorAll(".remain-input").forEach(inp => {
         inp.addEventListener("input", () => {
             const max = Number(inp.max);
             let v = Number(inp.value);
-
             if (v < 0) v = 0;
             if (v > max) v = max;
-
             inp.value = v;
             calculate();
+        });
+    });
+
+    /* 드롭다운 버튼 클릭 시 열기 */
+    document.querySelectorAll(".dropdown-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+            closeDropdowns();
+            document.getElementById(`drop-${i}`).style.display = "block";
         });
     });
 
     calculate();
 }
 
-/* ===============================
-   DROPDOWN
-=============================== */
-function toggleDropdown(i) {
-    closeDropdowns();
-    document.getElementById(`drop-${i}`).style.display = "block";
-}
-
 function closeDropdowns() {
     document.querySelectorAll(".dropdown-list").forEach(d => d.style.display = "none");
 }
 
-function selectRemain(i, v) {
+function selectRemain(i, val) {
     const input = document.querySelector(`input[data-row="${i}"]`);
-    input.value = v;
+    input.value = val;
     closeDropdowns();
     calculate();
 }
 
-/* ===============================
-   CALCULATE
-=============================== */
+/* 계산 */
 function calculate() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
 
-    if (!data) return;
+    let remains = [];
+    document.querySelectorAll(".remain-input").forEach((inp, i) => {
+        remains[i] = Number(inp.value);
+    });
 
-    /* A~G 남은 개수 */
-    const remains = Array.from(document.querySelectorAll(".remain-input"))
-        .map(inp => Number(inp.value));
+    const sumRemain = remains.reduce((s,x)=>s+x, 0);
+    document.getElementById("sum-remain").textContent = sumRemain;
 
-    /* 합계 표시 */
-    const sumRemain = remains.reduce((s, x) => s + x, 0);
-    const sumBox = document.getElementById("sum-remain");
-    if (sumBox) sumBox.textContent = sumRemain;
+    document.querySelectorAll("#table-area tr").forEach((row, i) => {
+        if (i === 0 || i > data.length) return;
 
-    /* 점수 / 티켓화 */
-    document.querySelectorAll("#table-area tbody tr").forEach((row, idx) => {
-        const item = data[idx];
-        const remain = item.name === "최종보상" ? 1 : remains[idx - 1];
-
+        const item = data[i-1];
+        const remain = item.name === "최종보상" ? 1 : remains[i-1];
         const score = item.price * remain;
         const ticket = (score / 30).toFixed(1);
 
@@ -206,115 +185,97 @@ function calculate() {
         row.querySelector(".ticket-cell").textContent = ticket;
     });
 
-    /* 필요한 티켓 */
-    const required = sumRemain * Number(selectedTicket);
-    document.getElementById("required-box").innerHTML =
-        `<div style="text-align:center; margin:15px 0; font-size:18px; font-weight:bold;">
-            전부 획득 시 필요한 티켓 → <span style="color:red">${required}</span>
-        </div>`;
-
-    renderResult(required);
+    renderResult(sumRemain * Number(selectedTicket));
 }
 
-/* ===============================
-   RESULT TABLE
-=============================== */
+/* 결과표 */
 function renderResult(required) {
-    const rows = document.querySelectorAll("#table-area tbody tr");
-    let tickets = [];
+    const area = document.getElementById("result-area");
+
+    let rows = document.querySelectorAll("#table-area tr");
+    let totals = [];
+    let excludeFinal = 0;
+    let excludeA = 0;
 
     rows.forEach((row, i) => {
-        const name = row.children[0].textContent;
-        const t = parseFloat(row.querySelector(".ticket-cell").textContent) || 0;
-        tickets[i] = t;
+        const cells = row.querySelectorAll("td");
+        if (cells.length === 6) {
+            const name = cells[0].textContent;
+            const t = parseFloat(cells[5].textContent) || 0;
+
+            totals.push(t);
+            if (name !== "최종보상") excludeFinal += t;
+            if (name !== "최종보상" && name !== "A") excludeA += t;
+        }
     });
 
-    const total = tickets.reduce((a, b) => a + b, 0);
-    const excludeFinal = tickets.slice(1).reduce((a, b) => a + b, 0);
-    const excludeA = tickets.slice(2).reduce((a, b) => a + b, 0);
+    function calc(val) {
+        return {
+            profit: val - required,
+            gem: (val - required) * 300
+        };
+    }
 
-    const calc = v => ({
-        profit: v - required,
-        gem: (v - required) * 300
-    });
-
-    const c1 = calc(total);
+    const c1 = calc(totals.reduce((a,b)=>a+b,0));
     const c2 = calc(excludeFinal);
     const c3 = calc(excludeA);
 
-    const fmt = v => v >= 0
+    const fmt = v => v >= 0 
         ? `<span class="green">${v}</span>`
         : `<span class="red">${v}</span>`;
 
-    document.getElementById("result-area").innerHTML = `
-        <table>
-            <tr>
-                <th>구분</th>
-                <th>전부 반환</th>
-                <th>최종 제외</th>
-                <th>최종 & A 제외</th>
-            </tr>
-            <tr>
-                <td>돌려받는 티켓</td>
-                <td>${total.toFixed(1)}</td>
-                <td>${excludeFinal.toFixed(1)}</td>
-                <td>${excludeA.toFixed(1)}</td>
-            </tr>
-            <tr>
-                <td>티켓 손익</td>
-                <td>${fmt(c1.profit.toFixed(1))}</td>
-                <td>${fmt(c2.profit.toFixed(1))}</td>
-                <td>${fmt(c3.profit.toFixed(1))}</td>
-            </tr>
-            <tr>
-                <td>보석 가치</td>
-                <td>${fmt(c1.gem)}</td>
-                <td>${fmt(c2.gem)}</td>
-                <td>${fmt(c3.gem)}</td>
-            </tr>
-        </table>`;
+    area.innerHTML = `
+    <table>
+        <tr>
+            <th>구분</th>
+            <th>전부 반환</th>
+            <th>최종 제외</th>
+            <th>최종 & A 제외</th>
+        </tr>
+        <tr>
+            <td class="purple">돌려받는 티켓</td>
+            <td>${(totals.reduce((a,b)=>a+b,0)).toFixed(1)}</td>
+            <td>${excludeFinal.toFixed(1)}</td>
+            <td>${excludeA.toFixed(1)}</td>
+        </tr>
+        <tr>
+            <td>티켓 손익</td>
+            <td>${fmt(c1.profit.toFixed(1))}</td>
+            <td>${fmt(c2.profit.toFixed(1))}</td>
+            <td>${fmt(c3.profit.toFixed(1))}</td>
+        </tr>
+        <tr>
+            <td>보석 가치</td>
+            <td>${fmt(c1.gem)}</td>
+            <td>${fmt(c2.gem)}</td>
+            <td>${fmt(c3.gem)}</td>
+        </tr>
+    </table>
+    `;
+
+    document.getElementById("required-box").innerHTML = `
+        <div style="text-align:center; margin:15px 0; font-size:18px; font-weight:bold;">
+            전부 획득 시 필요한 티켓 → <span class="purple">${required}</span>
+        </div>
+    `;
 }
 
-/* ===============================
-   IMAGE RENDERING
-=============================== */
+/* 이미지 */
 function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
 
-    const area = document.getElementById("image-area");
-    if (!images) {
-        area.innerHTML = "";
-        return;
+    let area = document.getElementById("image-area");
+    if (!area) {
+        area = document.createElement("div");
+        area.id = "image-area";
+        area.style.textAlign = "right";
+        area.style.marginTop = "-80px";
+        area.style.marginBottom = "20px";
+        document.querySelector(".container").prepend(area);
     }
 
     area.innerHTML = images
-        .map(src => `<img src="${src}" style="width:95px; margin-left:8px;">`)
-        .join("");
+        ? images.map(src => `<img src="${src}" style="width:90px; margin-left:8px;">`).join("")
+        : "";
 }
-
-/* ===============================
-   TOOLTIP
-=============================== */
-function showTip(event, text) {
-    closeTooltip();
-
-    const box = document.createElement("div");
-    box.className = "tooltip-box";
-    box.textContent = text;
-    document.body.appendChild(box);
-
-    const r = event.target.getBoundingClientRect();
-    box.style.left = r.left + "px";
-    box.style.top = (r.bottom + 5) + "px";
-    box.style.display = "block";
-}
-
-function closeTooltip() {
-    document.querySelectorAll(".tooltip-box").forEach(el => el.remove());
-}
-
-document.addEventListener("click", e => {
-    if (!e.target.classList.contains("tooltip"))
-        closeTooltip();
-});
