@@ -269,17 +269,24 @@ function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
 
+    // 이미지 영역이 없으면 새로 생성
     let area = document.getElementById("image-area");
     if (!area) {
         area = document.createElement("div");
         area.id = "image-area";
+
+        // 오른쪽 정렬 + 적당한 하단 여백
         area.style.textAlign = "right";
-        area.style.marginTop = "-80px";
-        area.style.marginBottom = "20px";
-        document.querySelector(".container").prepend(area);
+        area.style.marginBottom = "10px";
+
+        // ▼ 여기 중요! table-area 바로 앞에 삽입
+        const tableArea = document.getElementById("table-area");
+        tableArea.parentNode.insertBefore(area, tableArea);
     }
 
+    // 이미지 표시
     area.innerHTML = images
         ? images.map(src => `<img src="${src}" style="width:90px; margin-left:8px;">`).join("")
         : "";
 }
+
