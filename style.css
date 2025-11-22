@@ -1,6 +1,3 @@
-/* ===============================
-   기본 스타일
-=============================== */
 body {
     background: #f5f5f5;
     font-family: Arial, sans-serif;
@@ -11,54 +8,18 @@ body {
     background: white;
     padding: 20px;
     border-radius: 12px;
-    max-width: 1100px;
+    max-width: 900px;
     margin: auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.15);
-    position: relative;
 }
 
-/* 제목 */
 h1 {
     text-align: center;
     margin-bottom: 25px;
     font-size: 34px;
     font-weight: 800;
-    position: relative;
 }
 
-/* ===============================
-   제작자 문구 (오른쪽 상단)
-=============================== */
-#creator-tag {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    text-align: right;
-    font-size: 13px;
-    color: #444;
-    font-weight: bold;
-    line-height: 1.3;
-    opacity: 0.9;
-}
-
-#creator-tag span {
-    display: block;
-}
-
-/* ===============================
-   이미지 영역 (제목 오른쪽)
-=============================== */
-#image-area {
-    position: absolute;
-    top: 60px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-/* ===============================
-   선택 버튼 UI
-=============================== */
 .selector-block {
     margin-bottom: 18px;
 }
@@ -92,12 +53,10 @@ h1 {
     background: #cccccc !important;
     color: #777 !important;
     cursor: not-allowed !important;
-    opacity: 0.5;
+    opacity: 0.6 !important;
 }
 
-/* ===============================
-   테이블
-=============================== */
+/* 테이블 */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -121,26 +80,26 @@ td {
     background: #fff8c4;
 }
 
-/* ===============================
-   입력 필드 (셀 가운데 정렬 완전 고정)
-=============================== */
+/* 숫자 입력칸 */
 input[type="number"] {
     width: 70px;
-    height: 32px;
     background: #fff8c4;
     text-align: center;
     font-size: 16px;
-    margin: auto;
-    display: block;       /* 가운데 정렬 핵심 */
+    padding-right: 24px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
 
-/* ===============================
-   드롭다운
-=============================== */
+/* 드롭다운 */
 .dropdown-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 90px;
-    margin: auto;          /* 중앙 정렬 */
+    margin: 0 auto;
 }
 
 .dropdown-btn {
@@ -177,6 +136,40 @@ input[type="number"] {
     background: #eee;
 }
 
-/* 색상 */
-.red { color: red; }
-.green { color: green; }
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+
+/* 제작자 문구 */
+#creator-box {
+    margin-top: 40px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #444;
+    line-height: 1.4;
+}
+
+.creator-main {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.creator-sub {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* 이미지 영역 */
+#image-area img {
+    width: 90px;
+    margin-left: 8px;
+}
+
+#image-area {
+    text-align: right;
+    margin-bottom: 10px;
+}
