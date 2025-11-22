@@ -75,14 +75,17 @@ td {
     text-align: center;
 }
 
-/* 입력칸 동일 너비 & 정확한 가운데 정렬 */
+/* 노란색 배경 복구 */
+.yellow-cell {
+    background: #fff8c4;
+}
+
+/* 입력 박스 */
 input[type="number"] {
     width: 120px;
-    height: 30px;
+    height: 28px;
     font-size: 16px;
     text-align: center;
-    margin: auto;
-    display: block;
 }
 
 /* 드롭다운 */
@@ -98,7 +101,6 @@ input[type="number"] {
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    font-size: 18px;
 }
 
 .dropdown-list {
@@ -107,9 +109,10 @@ input[type="number"] {
     top: 36px;
     background: white;
     border: 1px solid #aaa;
-    max-height: 160px;
+    max-height: 150px;
     overflow-y: auto;
     z-index: 20;
+    display: none;
 }
 
 .dropdown-item {
@@ -120,37 +123,16 @@ input[type="number"] {
     background: #eee;
 }
 
-/* 이미지 영역 */
-#image-area {
-    margin: 5px 0 20px 0;
-    text-align: right;
-}
-
 /* 제작자 문구 */
 #creator {
-    margin-top: 45px;
+    margin-top: 40px;
     text-align: center;
-    font-size: 12px;
-    color: #777;
+    font-size: 13px;
+    color: #666;
     line-height: 1.5;
 }
 
-/* tooltip */
-.tooltip {
-    display: inline-block;
-    margin-left: 4px;
-    cursor: pointer;
-    color: #1e88e5;
-    font-weight: bold;
-}
-
-.tooltip-box {
-    display: none;
-    position: absolute;
-    background: #fff;
-    border: 1px solid #666;
-    padding: 8px;
-    font-size: 13px;
-    z-index: 200;
-    border-radius: 6px;
-}
+/* 색상 */
+.green { color: green; }
+.red { color: red; }
+.purple { color: #6a0dad; font-weight: bold; }
