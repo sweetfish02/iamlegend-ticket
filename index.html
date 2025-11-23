@@ -2,9 +2,18 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>카니발 티켓 변경 계산기</title>
+
+    <!-- 모바일 확대 방지 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- 텍스트 자동 확대 방지 -->
+    <style>
+        html, body {
+            -webkit-text-size-adjust: 100% !important;
+            text-size-adjust: 100% !important;
+        }
+    </style>
 
     <link rel="stylesheet" href="style.css" />
 </head>
@@ -17,7 +26,7 @@
     <div class="selector-block">
         <div class="label">티켓 단가</div>
 
-        <div class="button-grid" id="ticketButtons">
+        <div class="button-grid-2col">
             <button class="select-btn ticket-btn" data-ticket="2">x2</button>
             <button class="select-btn ticket-btn" data-ticket="3">x3</button>
         </div>
@@ -27,7 +36,7 @@
     <div class="selector-block">
         <div class="label">상자 안 보상의 총 개수</div>
 
-        <div class="button-grid" id="boxButtons">
+        <div class="button-grid-2col">
             <button class="select-btn box-btn" data-box="80">80</button>
             <button class="select-btn box-btn" data-box="120">120</button>
             <button class="select-btn box-btn" data-box="160">160</button>
@@ -41,20 +50,22 @@
     <!-- 중간표 -->
     <div id="table-area"></div>
 
-    <!-- 전부 획득 시 필요한 티켓 -->
+    <!-- 필요한 티켓 -->
     <div id="required-box"></div>
 
-    <!-- 결과 표 -->
+    <!-- 결과표 -->
     <div id="result-area"></div>
 
-    <!-- 제작자 -->
+    <!-- 제작자 문구 -->
     <div id="creator">
         Created by <span>은어Leͥgeͣnͫd</span><br>
         Belongs to Guild <span>[Leͥgeͣnͫd] / 60632</span>
     </div>
+
 </div>
 
 <script src="data.js"></script>
 <script src="script.js?v=300"></script>
+
 </body>
 </html>
