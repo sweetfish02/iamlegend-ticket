@@ -240,9 +240,9 @@ function renderResult(required) {
         </tr>
         <tr>
             <td>보석 가치</td>
-            <td>${fmt(c1.gem)}</td>
-            <td>${fmt(c2.gem)}</td>
-            <td>${fmt(c3.gem)}</td>
+            <td class="result-gem">${fmt(c1.gem)}</td>
+            <td class="result-gem">${fmt(c2.gem)}</td>
+            <td class="result-gem">${fmt(c3.gem)}</td>
         </tr>
     </table>
     `;
