@@ -13,7 +13,8 @@
     <!-- 티켓 단가 -->
     <div class="selector-block">
         <div class="label">티켓 단가</div>
-        <div class="button-row" id="ticketButtons">
+
+        <div class="button-grid-2">
             <button class="select-btn ticket-btn" data-ticket="2">x2</button>
             <button class="select-btn ticket-btn" data-ticket="3">x3</button>
         </div>
@@ -22,7 +23,8 @@
     <!-- 상자 개수 -->
     <div class="selector-block">
         <div class="label">상자 안 보상의 총 개수</div>
-        <div class="button-row" id="boxButtons">
+
+        <div class="button-grid-2">
             <button class="select-btn box-btn" data-box="80">80</button>
             <button class="select-btn box-btn" data-box="120">120</button>
             <button class="select-btn box-btn" data-box="160">160</button>
@@ -34,13 +36,17 @@
     <div id="image-area"></div>
 
     <!-- 중간표 -->
-    <div id="table-area"></div>
+    <div id="table-wrapper">
+        <div id="table-area"></div>
+    </div>
 
     <!-- 전부 획득 시 필요한 티켓 -->
     <div id="required-box"></div>
 
     <!-- 결과 표 -->
-    <div id="result-area"></div>
+    <div id="result-wrapper">
+        <div id="result-area"></div>
+    </div>
 
     <!-- 제작자 문구 -->
     <div id="creator">
@@ -51,6 +57,6 @@
 </div>
 
 <script src="data.js"></script>
-<script src="script.js?v=201"></script>
+<script src="script.js?v=300"></script>
 </body>
 </html>
