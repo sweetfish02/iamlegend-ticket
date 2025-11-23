@@ -243,33 +243,33 @@ function renderResult(required) {
         v >= 0 ? `<span class="green">${v}</span>` : `<span class="red">${v}</span>`;
 
     area.innerHTML = `
-    <table class="result-table">
-        <tr>
-            <th>구분</th>
-            <th>전부 반환</th>
-            <th>최종 제외</th>
-            <th>최종 & A 제외</th>
-        </tr>
-        <tr>
-            <td class="purple">돌려받는 티켓</td>
-            <td>${totalReturn.toFixed(1)}</td>
-            <td>${excludeFinal.toFixed(1)}</td>
-            <td>${excludeA.toFixed(1)}</td>
-        </tr>
-        <tr>
-            <td>티켓 손익</td>
-            <td>${fmt(c1.profit.toFixed(1))}</td>
-            <td>${fmt(c2.profit.toFixed(1))}</td>
-            <td>${fmt(c3.profit.toFixed(1))}</td>
-        </tr>
-        <tr>
-            <td>보석 가치</td>
-            <td class="gem">${fmt(c1.gem)}</td>
-            <td class="gem">${fmt(c2.gem)}</td>
-            <td class="gem">${fmt(c3.gem)}</td>
-        </tr>
-    </table>
-    `;
+<table>
+    <tr>
+        <th>구분</th>
+        <th>전부 반환</th>
+        <th>최종 제외</th>
+        <th>최종 & A 제외</th>
+    </tr>
+    <tr>
+        <td class="purple">돌려받는 티켓</td>
+        <td>${totalReturn.toFixed(1)}</td>
+        <td>${excludeFinal.toFixed(1)}</td>
+        <td>${excludeA.toFixed(1)}</td>
+    </tr>
+    <tr>
+        <td>티켓 손익</td>
+        <td>${fmt(c1.profit.toFixed(1))}</td>
+        <td>${fmt(c2.profit.toFixed(1))}</td>
+        <td>${fmt(c3.profit.toFixed(1))}</td>
+    </tr>
+    <tr>
+        <td>보석 가치</td>
+        <td class="result-gem">${fmt(c1.gem)}</td>
+        <td class="result-gem">${fmt(c2.gem)}</td>
+        <td class="result-gem">${fmt(c3.gem)}</td>
+    </tr>
+</table>
+`;
 
     document.getElementById("required-box").innerHTML = `
         <div style="text-align:center; margin:15px 0; font-size:18px; font-weight:bold;">
