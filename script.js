@@ -9,33 +9,37 @@ const imageMap = {
     "3_160": ["images/3_160_1.png"]
 };
 
+
 let selectedTicket = null;
 let selectedBox = null;
 
-/* ===============================
-   티켓 단가 버튼
-=============================== */
-document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        selectedTicket = btn.dataset.ticket;
-        selectedBox = null;
-        updateButtonState();
-    });
-});
 
 /* ===============================
-   상자 개수 버튼
+   버튼 클릭 이벤트
 =============================== */
-document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        if (!btn.classList.contains("disabled-btn")) {
-            selectedBox = btn.dataset.box;
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            selectedTicket = btn.dataset.ticket;
+            selectedBox = null;
             updateButtonState();
-            renderTable();
-            renderImages();
-        }
+        });
     });
+
+    document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (!btn.classList.contains("disabled-btn")) {
+                selectedBox = btn.dataset.box;
+                updateButtonState();
+                renderImages();
+                renderTable();
+            }
+        });
+    });
+
 });
+
 
 /* ===============================
    버튼 활성/비활성
@@ -67,8 +71,9 @@ function updateButtonState() {
     }
 }
 
+
 /* ===============================
-   중간표 생성
+   중간표 테이블 생성
 =============================== */
 function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
@@ -76,7 +81,7 @@ function renderTable() {
     const area = document.getElementById("table-area");
 
     if (!data) {
-        area.innerHTML = "<p style='color:red;text-align:center;'>만족하는 상자 없음</p>";
+        area.innerHTML = `<p style="color:red; text-align:center;">해당 조합의 상자가 없습니다.</p>`;
         return;
     }
 
@@ -93,25 +98,24 @@ function renderTable() {
     `;
 
     data.forEach((item, index) => {
-        const max = item.count;
-        const isFinal = item.name === "최종보상";
 
         let displayName = item.name;
         if (displayName.length === 1) displayName += "보상";
 
-        const inputField = isFinal
+        const max = item.count;
+        const isFinal = item.name === "최종보상";
+
+        let inputField = isFinal
             ? `<input type="number" value="1" readonly>`
             : `
                 <div class="dropdown-wrapper yellow-cell">
-                    <input 
-                        type="number" 
-                        class="remain-input" 
-                        data-index="${index}" 
-                        value="${max}" 
-                        min="0" max="${max}"
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                    >
+                    <input type="number" 
+                           class="remain-input" 
+                           data-index="${index}" 
+                           value="${max}" 
+                           min="0" 
+                           max="${max}"
+                           inputmode="numeric">
                     <div class="dropdown-btn" data-index="${index}">▼</div>
                     <div class="dropdown-list" id="drop-${index}">
                         ${Array.from({ length: max + 1 }, (_, n) =>
@@ -147,46 +151,48 @@ function renderTable() {
     html += `</table>`;
     area.innerHTML = html;
 
-    /* 입력 이벤트 */
+
+    /* 입력 이벤트 활성화 */
     document.querySelectorAll(".remain-input").forEach(inp => {
         inp.addEventListener("input", () => {
-            let v = Number(inp.value);
             const max = Number(inp.max);
+            let v = Number(inp.value);
+
             if (v < 0) v = 0;
             if (v > max) v = max;
+
             inp.value = v;
             calculate();
         });
     });
 
-    /* 드롭다운 열기 */
+    /* 드롭다운 버튼 */
     document.querySelectorAll(".dropdown-btn").forEach(btn => {
-        btn.addEventListener("click", e => {
-            e.stopPropagation();
+        btn.addEventListener("click", () => {
             closeDropdowns();
             const idx = btn.dataset.index;
             document.getElementById(`drop-${idx}`).style.display = "block";
         });
     });
 
-    /* 화면 클릭 → 드롭다운 닫기 */
-    document.addEventListener("click", closeDropdowns);
-
     calculate();
 }
 
-/* 드롭다운 닫기 */
+
+/* 모든 드롭다운 닫기 */
 function closeDropdowns() {
     document.querySelectorAll(".dropdown-list").forEach(d => d.style.display = "none");
 }
 
-/* 드롭다운 항목 선택 */
+
+/* 드롭다운에서 값 선택 */
 function selectRemain(i, val) {
     const input = document.querySelector(`input[data-index="${i}"]`);
     input.value = val;
     closeDropdowns();
     calculate();
 }
+
 
 /* ===============================
    계산
@@ -205,6 +211,8 @@ function calculate() {
     const sumRemain = remains.slice(1).reduce((s, x) => s + x, 0);
     document.getElementById("sum-remain").textContent = sumRemain;
 
+
+    /* 점수 / 환산 티켓 */
     document.querySelectorAll(".reward-row").forEach(row => {
         const idx = Number(row.dataset.index);
         const item = data[idx];
@@ -220,8 +228,9 @@ function calculate() {
     renderResult(sumRemain * Number(selectedTicket));
 }
 
+
 /* ===============================
-   결과 표 생성
+   결과표
 =============================== */
 function renderResult(required) {
     const area = document.getElementById("result-area");
@@ -235,6 +244,7 @@ function renderResult(required) {
         const t = parseFloat(row.querySelector(".ticket-cell").textContent) || 0;
 
         totals.push(t);
+
         if (name !== "최종보상") excludeFinal += t;
         if (name !== "최종보상" && name !== "A") excludeA += t;
     });
@@ -253,8 +263,9 @@ function renderResult(required) {
     const c2 = calc(excludeFinal);
     const c3 = calc(excludeA);
 
-    const fmt = v =>
-        v >= 0 ? `<span class="green">${v}</span>` : `<span class="red">${v}</span>`;
+    const fmt = v => v >= 0
+        ? `<span class="green">${v}</span>`
+        : `<span class="red">${v}</span>`;
 
     area.innerHTML = `
         <table>
@@ -292,15 +303,24 @@ function renderResult(required) {
     `;
 }
 
+
 /* ===============================
-   이미지 표시
+   이미지 렌더링
 =============================== */
 function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
 
     let area = document.getElementById("image-area");
-    if (!area) return;
+
+    if (!area) {
+        area = document.createElement("div");
+        area.id = "image-area";
+        area.style.textAlign = "right";
+        area.style.marginBottom = "10px";
+        const tableArea = document.getElementById("table-area");
+        tableArea.parentNode.insertBefore(area, tableArea);
+    }
 
     area.innerHTML = images
         ? images.map(src => `<img src="${src}" style="width:90px; margin-left:8px;">`).join("")
