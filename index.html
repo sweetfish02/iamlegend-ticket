@@ -2,26 +2,26 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <title>티켓 계산기 (완성본)</title>
+    <title>카니발 티켓 변경 계산기</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div class="container">
-    <h1>티켓 계산기</h1>
+    <h1>카니발 티켓 변경 계산기</h1>
 
     <!-- 티켓 단가 -->
     <div class="selector-block">
         <div class="label">티켓 단가</div>
         <div class="button-row" id="ticketButtons">
-            <button class="select-btn ticket-btn" data-ticket="2">2</button>
-            <button class="select-btn ticket-btn" data-ticket="3">3</button>
+            <button class="select-btn ticket-btn" data-ticket="2">x2</button>
+            <button class="select-btn ticket-btn" data-ticket="3">x3</button>
         </div>
     </div>
 
     <!-- 상자 개수 -->
     <div class="selector-block">
-        <div class="label">상자 개수</div>
+        <div class="label">상자 안 보상의 총 개수</div>
         <div class="button-row" id="boxButtons">
             <button class="select-btn box-btn" data-box="80">80</button>
             <button class="select-btn box-btn" data-box="120">120</button>
@@ -29,6 +29,9 @@
             <button class="select-btn box-btn" data-box="240">240</button>
         </div>
     </div>
+
+    <!-- 이미지 -->
+    <div id="image-area"></div>
 
     <!-- 중간표 -->
     <div id="table-area"></div>
@@ -48,6 +51,6 @@
 </div>
 
 <script src="data.js"></script>
-<script src="script.js?v=200"></script>
+<script src="script.js?v=201"></script>
 </body>
 </html>
