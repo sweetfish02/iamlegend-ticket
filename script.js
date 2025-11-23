@@ -12,7 +12,9 @@ const imageMap = {
 let selectedTicket = null;
 let selectedBox = null;
 
-/* 버튼 */
+/* ===============================
+   버튼 이벤트
+=============================== */
 document.querySelectorAll("#ticketButtons .select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         selectedTicket = btn.dataset.ticket;
@@ -26,16 +28,18 @@ document.querySelectorAll("#boxButtons .select-btn").forEach(btn => {
         if (!btn.classList.contains("disabled-btn")) {
             selectedBox = btn.dataset.box;
             updateButtonState();
-            renderTable();
             renderImages();
+            renderTable();
         }
     });
 });
 
-/* 버튼 활성화 */
+/* ===============================
+   버튼 활성화 상태 갱신
+=============================== */
 function updateButtonState() {
-    const ticketBtns = document.querySelectorAll("#ticketButtons .select-btn");
-    const boxBtns = document.querySelectorAll("#boxButtons .select-btn");
+    const ticketBtns = document.querySelectorAll(".ticket-btn");
+    const boxBtns = document.querySelectorAll(".box-btn");
 
     ticketBtns.forEach(b => b.classList.remove("active"));
     boxBtns.forEach(b => {
@@ -60,14 +64,16 @@ function updateButtonState() {
     }
 }
 
-/* 테이블 생성 */
+/* ===============================
+   표 렌더링
+=============================== */
 function renderTable() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
     const area = document.getElementById("table-area");
 
     if (!data) {
-        area.innerHTML = "<p style='color:red;text-align:center;'>만족하는 상자 없음</p>";
+        area.innerHTML = "<p style='color:red; text-align:center;'>데이터 없음</p>";
         return;
     }
 
@@ -85,28 +91,30 @@ function renderTable() {
 
     data.forEach((item, index) => {
         const max = item.count;
-        const isFinal = item.name === "최종보상";
+        let name = item.name;
 
-        let displayName = item.name;
-        if (item.name.length === 1) displayName = item.name + "보상";
+        if (item.name.length === 1) {
+            name = item.name + "보상";
+        }
 
-        const inputField = isFinal
-            ? `<input type="number" value="1" readonly>`
-            : `
-                <div class="dropdown-wrapper yellow-cell">
-                    <input type="number" class="remain-input" data-index="${index}" value="${max}" min="0" max="${max}">
-                    <div class="dropdown-btn" data-index="${index}">▼</div>
-                    <div class="dropdown-list" id="drop-${index}">
-                        ${Array.from({ length: max + 1 }, (_, n) =>
-                            `<div class="dropdown-item" onclick="selectRemain(${index},${n})">${n}</div>`
-                        ).join("")}
-                    </div>
+        const inputField =
+            item.name === "최종보상"
+                ? `<input type="number" value="1" readonly>`
+                : `
+            <div class="dropdown-wrapper yellow-cell">
+                <input type="number" class="remain-input" data-index="${index}" value="${max}" min="0" max="${max}">
+                <div class="dropdown-btn" data-index="${index}">▼</div>
+                <div class="dropdown-list" id="drop-${index}">
+                    ${Array.from({ length: max + 1 }, (_, n) =>
+                        `<div class="dropdown-item" onclick="selectRemain(${index},${n})">${n}</div>`
+                    ).join("")}
                 </div>
-            `;
+            </div>
+        `;
 
         html += `
             <tr class="reward-row" data-index="${index}">
-                <td>${displayName}</td>
+                <td>${name}</td>
                 <td class="yellow-cell">${inputField}</td>
                 <td>${item.count}</td>
                 <td>${item.price}</td>
@@ -116,11 +124,10 @@ function renderTable() {
         `;
     });
 
-    /* 합계행 */
     const totalCount = data.slice(1).reduce((s, x) => s + x.count, 0);
 
     html += `
-        <tr id="sum-row">
+        <tr>
             <td>A~G보상의 합계</td>
             <td id="sum-remain" class="yellow-cell"></td>
             <td>${totalCount}</td>
@@ -131,10 +138,11 @@ function renderTable() {
     html += `</table>`;
     area.innerHTML = html;
 
+    /* 입력 이벤트 */
     document.querySelectorAll(".remain-input").forEach(inp => {
         inp.addEventListener("input", () => {
-            const max = Number(inp.max);
             let v = Number(inp.value);
+            const max = Number(inp.max);
             if (v < 0) v = 0;
             if (v > max) v = max;
             inp.value = v;
@@ -142,10 +150,11 @@ function renderTable() {
         });
     });
 
+    /* 드롭다운 버튼 */
     document.querySelectorAll(".dropdown-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            const idx = btn.dataset.index;
             closeDropdowns();
+            const idx = btn.dataset.index;
             document.getElementById(`drop-${idx}`).style.display = "block";
         });
     });
@@ -153,10 +162,16 @@ function renderTable() {
     calculate();
 }
 
+/* ===============================
+   드롭다운 닫기
+=============================== */
 function closeDropdowns() {
     document.querySelectorAll(".dropdown-list").forEach(d => d.style.display = "none");
 }
 
+/* ===============================
+   드롭다운 선택
+=============================== */
 function selectRemain(i, val) {
     const input = document.querySelector(`input[data-index="${i}"]`);
     input.value = val;
@@ -164,7 +179,9 @@ function selectRemain(i, val) {
     calculate();
 }
 
-/* 계산 */
+/* ===============================
+   계산
+=============================== */
 function calculate() {
     const key = `${selectedTicket}_${selectedBox}`;
     const data = rewardData[key];
@@ -194,7 +211,9 @@ function calculate() {
     renderResult(sumRemain * Number(selectedTicket));
 }
 
-/* 결과표 */
+/* ===============================
+   결과표 계산
+=============================== */
 function renderResult(required) {
     const area = document.getElementById("result-area");
 
@@ -217,7 +236,7 @@ function renderResult(required) {
         const diff = val - required;
         return {
             profit: diff,
-            gem: Math.ceil(diff * 300)
+            gem: Math.ceil(diff * 300)  // 정수 올림
         };
     }
 
@@ -225,8 +244,9 @@ function renderResult(required) {
     const c2 = calc(excludeFinal);
     const c3 = calc(excludeA);
 
-    const fmt = v =>
-        v >= 0 ? `<span class="green">${v}</span>` : `<span class="red">${v}</span>`;
+    const fmt = v => v >= 0
+        ? `<span class="green">${v}</span>`
+        : `<span class="red">${v}</span>`;
 
     area.innerHTML = `
     <table>
@@ -258,29 +278,31 @@ function renderResult(required) {
     `;
 
     document.getElementById("required-box").innerHTML = `
-        <div style="text-align:center; margin:15px 0; font-size:18px; font-weight:bold;">
+        <div style="text-align:center; margin:12px 0; font-size:18px; font-weight:bold;">
             전부 획득 시 필요한 티켓 → <span class="purple">${required}</span>
         </div>
     `;
 }
 
-/* 이미지 */
+/* ===============================
+   이미지 표시
+=============================== */
 function renderImages() {
     const key = `${selectedTicket}_${selectedBox}`;
     const images = imageMap[key];
 
-    let area = document.getElementById("image-area");
-    if (!area) {
-        area = document.createElement("div");
-        area.id = "image-area";
-        area.style.textAlign = "right";
-        area.style.marginBottom = "10px";
-
-        const tableArea = document.getElementById("table-area");
-        tableArea.parentNode.insertBefore(area, tableArea);
-    }
+    const area = document.getElementById("image-area");
 
     area.innerHTML = images
-        ? images.map(src => `<img src="${src}" style="width:90px; margin-left:8px;">`).join("")
+        ? images.map(src => `<img src="${src}" alt="" />`).join("")
         : "";
 }
+
+/* ===============================
+   외부 클릭 시 드롭다운 닫기
+=============================== */
+document.addEventListener("click", e => {
+    if (!e.target.classList.contains("dropdown-btn")) {
+        closeDropdowns();
+    }
+});
