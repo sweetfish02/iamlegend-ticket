@@ -54,6 +54,11 @@ h1 {
     gap: 10px;
 }
 
+.button-grid-4col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
 .select-btn {
     padding: 12px 0;
     border-radius: 8px;
