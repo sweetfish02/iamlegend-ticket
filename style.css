@@ -47,18 +47,20 @@ h1 {
     margin-bottom: 8px;
 }
 
-/* 🔥 모바일 최적화된 2열 그리드 */
+/* 2열 그리드 (티켓 단가) */
 .button-grid-2col {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 }
 
+/* 4열 그리드 (상자 개수) */
 .button-grid-4col {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
 }
+
 .select-btn {
     padding: 12px 0;
     border-radius: 8px;
@@ -106,7 +108,7 @@ td {
     font-size: 15px;
 }
 
-/* (3) 결과표 4개 열 너비 동일화 */
+/* 결과표 4개 열 너비 동일화 */
 #result-area table th,
 #result-area table td {
     width: 25%;
@@ -129,7 +131,7 @@ td {
     gap: 6px;
 }
 
-/* (2) 최종보상 입력값도 정중앙 고정 */
+/* 최종보상 입력도 가운데 정렬 */
 .remain-input,
 input[type="number"][readonly] {
     flex: 1;
@@ -172,17 +174,58 @@ input[type="number"][readonly] {
 .red { color: red; }
 .purple { color: #6a0dad; font-weight: bold; }
 
-/* ===============================
-   (4) 보석 가치 숫자 더 강조
-=============================== */
-
+/* 보석 가치 숫자 더 강조 */
 .result-gem {
     font-size: 18px;
     font-weight: 900;
 }
 
 /* ===============================
-   제작자 문구 (5)
+   고급 옵션 스타일
+=============================== */
+
+#advanced-option {
+    margin-top: 25px;
+}
+
+#adv-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+
+#adv-table td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 14px;
+}
+
+.adv-check-cell {
+    width: 40px;
+    text-align: center;
+    background: #fff8c4;
+}
+
+.adv-desc-cell {
+    text-align: left;
+    background: #fff8c4;
+    font-weight: 600;
+}
+
+.adv-label-cell {
+    background: #e3f2fd;
+    font-weight: 600;
+    text-align: left;
+    width: 60%;
+}
+
+.adv-input-cell {
+    background: #fffde7;
+    text-align: center;
+}
+
+/* ===============================
+   제작자 문구 + 로고
 =============================== */
 
 #creator {
@@ -193,13 +236,14 @@ input[type="number"][readonly] {
     line-height: 1.5;
     width: 100%;
 }
+
 .creator-image {
     text-align: center;
     margin-top: 20px;
 }
 
 .creator-image img {
-    width: 160px;   /* 필요하면 120~200px 사이로 조절해도 좋음 */
+    width: 160px;
     max-width: 70%;
     height: auto;
 }
