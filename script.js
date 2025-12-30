@@ -12,6 +12,14 @@ const imageMap = {
 let selectedTicket = null;
 let selectedBox = null;
 
+/* 고급 옵션용 전역 상태 */
+let lastRequiredTickets = 0;
+const floorThresholds = [0, 400, 600, 800, 1050, 1300, 1550, 1800, 2050, 2300];
+
+let advToggle = null;
+let advRows = [];
+let advCurrentInput = null;
+
 
 /* ===============================
    버튼 선택 이벤트
@@ -210,12 +218,20 @@ function calculate() {
         row.querySelector(".ticket-cell").textContent = ticket;
     });
 
-    renderResult(sumRemain * Number(selectedTicket));
+    const required = sumRemain * Number(selectedTicket);
+    lastRequiredTickets = required;
+
+    renderResult(required);
+
+    /* 고급옵션 켜져 있으면 같이 업데이트 */
+    if (advToggle && advToggle.checked) {
+        updateAdvanced();
+    }
 }
 
 
 /* ===============================
-   결과표 생성 (정확하게 수정된 버전)
+   결과표 생성
 =============================== */
 function renderResult(required) {
     const area = document.getElementById("result-area");
@@ -280,6 +296,63 @@ function renderResult(required) {
 
 
 /* ===============================
+   고급 옵션 로직
+=============================== */
+
+function setupAdvancedOption() {
+    advToggle = document.getElementById("advToggle");
+    advCurrentInput = document.getElementById("advCurrent");
+    advRows = document.querySelectorAll(".adv-extra");
+
+    if (!advToggle || !advCurrentInput) return;
+
+    /* 처음에는 접힌 상태 */
+    advRows.forEach(r => r.style.display = "none");
+
+    advToggle.addEventListener("change", () => {
+        const show = advToggle.checked;
+        advRows.forEach(r => r.style.display = show ? "table-row" : "none");
+        if (show) updateAdvanced();
+    });
+
+    advCurrentInput.addEventListener("input", () => {
+        if (advToggle.checked) updateAdvanced();
+    });
+}
+
+/* 6행 2열 계산에 해당하는 함수 */
+function computeCoreFromFloors(current, dest, arr) {
+    let sum = 0;
+    for (let i = 0; i < arr.length - 1; i++) {
+        const low = arr[i];
+        const high = arr[i + 1];
+        const delta = high - low;
+        if (delta <= 0) continue;
+
+        const overlap = Math.min(dest, high) - Math.max(current, low);
+        if (overlap > 0) {
+            /* 7행 * 8행 (양수만) 의 SUMPRODUCT 과 동일 */
+            sum += overlap / delta;
+        }
+    }
+    return sum;
+}
+
+function updateAdvanced() {
+    if (!advCurrentInput) return;
+
+    const current = Number(advCurrentInput.value) || 0;
+    const increase = lastRequiredTickets || 0;
+    const dest = current + increase;
+
+    document.getElementById("advIncrease").textContent = increase;
+    document.getElementById("advDestination").textContent = dest;
+
+    const core = computeCoreFromFloors(current, dest, floorThresholds);
+    document.getElementById("advCore").textContent = core.toFixed(2);
+}
+
+/* ===============================
    이미지 출력
 =============================== */
 function renderImages() {
@@ -301,3 +374,6 @@ function renderImages() {
         ? images.map(src => `<img src="${src}" style="width:90px; margin-left:8px;">`).join("")
         : "";
 }
+
+/* 고급 옵션 초기 세팅 */
+setupAdvancedOption();
