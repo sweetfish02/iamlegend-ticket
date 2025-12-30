@@ -193,6 +193,16 @@ input[type="number"][readonly] {
     line-height: 1.5;
     width: 100%;
 }
+.creator-image {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.creator-image img {
+    width: 160px;   /* 필요하면 120~200px 사이로 조절해도 좋음 */
+    max-width: 70%;
+    height: auto;
+}
 
 /* 모바일 확대 방지 */
 input[type=number] {
