@@ -275,3 +275,15 @@ input[type=number]::-webkit-outer-spin-button {
         font-size: 15px;
     }
 }
+.core-images {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.core-images img {
+    width: 40px;      /* 필요하면 30~60px 조절 */
+    max-width: 100%;
+    height: auto;
+}
