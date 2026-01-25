@@ -14,7 +14,7 @@ let selectedBox = null;
 
 /* 고급 옵션용 전역 상태 */
 let lastRequiredTickets = 0;
-const floorThresholds = [0, 400, 600, 800, 1050, 1300, 1550, 1800, 2050, 2300];
+const floorThresholds = [0, 250, 500, 750, 1050, 1350, 1650, 1950, 2100, 2300];
 
 let advToggle = null;
 let advRows = [];
