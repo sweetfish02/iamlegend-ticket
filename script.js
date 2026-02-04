@@ -377,3 +377,10 @@ function renderImages() {
 
 /* 고급 옵션 초기 세팅 */
 setupAdvancedOption();
+
+// 드롭다운: 바깥 클릭 시 닫기
+document.addEventListener("click", (e) => {
+  // dropdown-wrapper 내부 클릭이면 닫지 않음
+  if (e.target.closest(".dropdown-wrapper")) return;
+  closeDropdowns();
+});
