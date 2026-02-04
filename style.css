@@ -287,3 +287,23 @@ input[type=number]::-webkit-outer-spin-button {
     max-width: 100%;
     height: auto;
 }
+/* ===============================
+   고급옵션: 열 비율 안정화 + 숫자 가독성 개선
+=============================== */
+
+/* 고급옵션 표: 체크박스 열은 고정폭, 나머지는 자동 */
+.adv-check-cell { width: 40px; }
+
+/* 고급옵션 표의 '오른쪽 열(값/입력)' 글자 크기 키우기 */
+#adv-table td.adv-input-cell {
+    font-size: 18px;      /* 결과표 보석 가치(18px) 느낌으로 맞춤 */
+    font-weight: 700;
+}
+
+/* 현재 층수 입력칸: 숫자 가운데 정렬 + 보기 좋은 높이 */
+#advCurrent {
+    text-align: center;
+    height: 34px;
+    font-size: 18px;
+    font-weight: 700;
+}
