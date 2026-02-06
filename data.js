@@ -22,7 +22,7 @@ const rewardData = {
         { name: "C", count: 9, price: 120 },
         { name: "D", count: 15, price: 72 },
         { name: "E", count: 30, price: 36 },
-        { name: "F", count: 33, price: 12 },
+        { name: "F", count: 90, price: 12 },
         { name: "G", count: 90, price: 12 }
     ],
 
