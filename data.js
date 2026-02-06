@@ -47,7 +47,7 @@ const rewardData = {
         { name: "F", count: 30, price: 18 },
         { name: "G", count: 40, price: 12 }
     ],
-
+  
     "3_160": [
         { name: "최종보상", count: 1, price: 540 },
         { name: "A", count: 2, price: 540 },
