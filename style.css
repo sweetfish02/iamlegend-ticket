@@ -193,6 +193,19 @@ input[type="number"][readonly] {
     background: #fff8c4;
 }
 
+/* 입력칸 + 단위(층/개) 한 줄 배치 */
+.adv-unit-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.adv-unit {
+    font-weight: 800;
+    font-size: 18px;
+}
+
 /* 체크박스 + 텍스트 묶음 */
 .adv-toggle-wrap {
     display: inline-flex;
@@ -235,7 +248,7 @@ input[type="number"][readonly] {
 .adv-label-cell {
     background: #e3f2fd;
     font-weight: 600;
-    text-align: left;
+    text-align: center;
 }
 
 .adv-input-cell {
