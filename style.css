@@ -183,6 +183,31 @@ input[type="number"][readonly] {
 /* ===============================
    고급 옵션 스타일
 =============================== */
+/* 고급옵션 표 컬럼 비율 고정 */
+#adv-table col.adv-col-1 { width: 40%; }
+#adv-table col.adv-col-2 { width: 60%; }
+
+/* 고급옵션 첫 열(체크 + 라벨) 정렬 */
+#adv-table td.adv-col1-cell {
+    text-align: center;
+    background: #fff8c4;
+}
+
+/* 체크박스 + 텍스트 묶음 */
+.adv-toggle-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* '고급옵션' 글자 강조 */
+.adv-label-text {
+    font-size: 16px;
+}
+
 
 #advanced-option {
     margin-top: 25px;
@@ -200,11 +225,6 @@ input[type="number"][readonly] {
     font-size: 14px;
 }
 
-.adv-check-cell {
-    width: 40px;
-    text-align: center;
-    background: #fff8c4;
-}
 
 .adv-desc-cell {
     text-align: left;
@@ -216,7 +236,6 @@ input[type="number"][readonly] {
     background: #e3f2fd;
     font-weight: 600;
     text-align: left;
-    width: 60%;
 }
 
 .adv-input-cell {
