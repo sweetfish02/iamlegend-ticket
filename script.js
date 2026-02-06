@@ -345,12 +345,22 @@ function updateAdvanced() {
     const increase = lastRequiredTickets || 0;
     const dest = current + increase;
 
-    document.getElementById("advIncrease").textContent = increase;
-    document.getElementById("advDestination").textContent = dest;
+    // 증가하는 층수: 보라색 + '층'
+    document.getElementById("advIncrease").innerHTML =
+        `<span class="purple">${increase}층</span>`;
 
+    // 도착하는 층수: '층'만 붙이기 (색은 기본)
+    document.getElementById("advDestination").textContent =
+        `${dest}층`;
+
+    // 코어 계산은 기존 그대로
     const core = computeCoreFromFloors(current, dest, floorThresholds);
-    document.getElementById("advCore").textContent = core.toFixed(2);
+
+    // 코어 개수: 초록색 + '개'
+    document.getElementById("advCore").innerHTML =
+        `<span class="green">${core.toFixed(2)}개</span>`;
 }
+
 
 /* ===============================
    이미지 출력
